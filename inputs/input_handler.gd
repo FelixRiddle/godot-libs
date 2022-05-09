@@ -1,125 +1,88 @@
 class_name InputHandler
 
+var deadzone:float = 0.10 setget set_deadzone, get_deadzone
 var disable_wasd:bool = false setget set_disable_wasd, get_disable_wasd
 var disable_arrows:bool = true setget set_disable_arrows, get_disable_arrows
 var disable_joystick:bool = false setget set_disable_joystick, \
 		get_disable_joystick
 
 
-func _init(_options = {}) -> void:
-	if(_options.get("disable_wasd")):
+func _init(_options = { }) -> void:
+	if(_options.has("disable_wasd")):
 		self.disable_wasd = _options["disable_wasd"]
-	if(_options.get("disable_arrows")):
+	if(_options.has("disable_arrows")):
 		self.disable_arrows = _options["disable_arrows"]
-	if(_options.get("disable_joystick")):
+	if(_options.has("disable_joystick")):
 		self.disable_joystick = _options["disable_joystick"]
-	if(_options.get("disable_joypad")):
+	if(_options.has("disable_joypad")):
 		self.disable_joystick = _options["disable_joypad"]
-
-
-# Checks the key pressed events, doesn't check if the arguments don't
-# exist
-func check_key(event: InputEventKey, wasd_key: int, \
-		arrow_key: int) -> bool:
-	if event.scancode == wasd_key and !self.disable_wasd:
-		return true
-	elif event.scancode == arrow_key and !self.disable_arrows:
-		return true
-	return false
+	if(_options.has("deadzone")):
+		self.deadzone = _options["deadzone"]
 
 
 ### Player movement ###
-# I've done this because its kinda annoying changing the project
-# inputs every time we create a project
-# Reference:
-# https://docs.godotengine.org/en/stable/classes/class_%40globalscope.html#enum-globalscope-joysticklist
+# Personal notes for using Input.get_joy_axis(device, axis):
+# The first argument(device), I guess it's that if there are
+# more than one device connected to the same computer, they are
+# listed with an index starting from 0.
+# For the second argument use one of the following
+#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
+#JOY_AXIS_1 = 1 --- Gamepad left stick vertical axis.
+# Up is -1 for gamepads for some reason(tested with an old one)
 # Check if the player is moving left
-func left(event: InputEvent) -> bool:
-	# Keyboard
-	if event is InputEventKey:
-		if event.pressed:
-			return check_key(event, KEY_A, KEY_LEFT)
-		elif event.echo:
-			return check_key(event, KEY_A, KEY_LEFT)
+func left() -> bool:
+	if(Input.is_physical_key_pressed(KEY_A) && !self.disable_wasd):
+		return true
+	if(Input.is_physical_key_pressed(KEY_LEFT) && !self.disable_arrows):
+		return true
 	
-	# Joystick/Joypad
-	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
-	#JOY_AXIS_1 = 1 --- Gamepad left stick vertical axis.
-	if(event is InputEventJoypadMotion and !self.disable_joystick):
-		if event.axis == 0:
-			# variable < 0 means the player is moving left
-			# variable > 0 means the player is moving right
-			# in a 2D world
-			if event.axis_value < 0:
-				return true
+	# The minus is very important xD
+	if(Input.get_joy_axis(0, 0) < -self.deadzone && !self.disable_joystick):
+		return true
 	return false
 
 
 # Check if the player is moving right
-func right(event: InputEvent) -> bool:
-	# Keyboard
-	if event is InputEventKey:
-		if event.pressed:
-			return check_key(event, KEY_D, KEY_RIGHT)
-		elif event.echo:
-			return check_key(event, KEY_D, KEY_RIGHT)
+func right() -> bool:
+	if(Input.is_physical_key_pressed(KEY_D) && !self.disable_wasd):
+		return true
+	if(Input.is_physical_key_pressed(KEY_RIGHT) && !self.disable_arrows):
+		return true
 	
-	# Joystick/Joypad
-	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
-	#JOY_AXIS_1 = 1 --- Gamepad left stick vertical axis.
-	if(event is InputEventJoypadMotion and !self.disable_joystick):
-		if event.axis == 0:
-			# variable < 0 means the player is moving left
-			# variable > 0 means the player is moving right
-			# in a 2D world
-			if event.axis_value > 0:
-				return true
+	if(Input.get_joy_axis(0, 0) > self.deadzone && !self.disable_joystick):
+		return true
 	return false
 
 
 # Check if the player is moving up
-func up(event: InputEvent) -> bool:
-	# Keyboard
-	if event is InputEventKey:
-		if event.pressed:
-			return check_key(event, KEY_W, KEY_UP)
-		elif event.echo:
-			return check_key(event, KEY_W, KEY_UP)
+func up() -> bool:
+	if(Input.is_physical_key_pressed(KEY_W) && !self.disable_wasd):
+		return true
+	if(Input.is_physical_key_pressed(KEY_UP) && !self.disable_arrows):
+		return true
 	
-	# Joystick/Joypad
-	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
-	#JOY_AXIS_1 = 1 --- Gamepad left stick vertical axis.
-	if(event is InputEventJoypadMotion and !self.disable_joystick):
-		if event.axis == 1:
-			# variable < 0 means the player is moving down
-			# variable > 0 means the player is moving up
-			# in a 2D world
-			if event.axis_value > 0:
-				return true
+	# The minus is very important xD
+	if(Input.get_joy_axis(0, 1) < -self.deadzone && !self.disable_joystick):
+		return true
 	return false
 
 
-# Check if the player is moving down
-func down(event: InputEvent) -> bool:
-	# Keyboard
-	if event is InputEventKey:
-		if event.pressed:
-			return check_key(event, KEY_S, KEY_DOWN)
-		if event.echo:
-			return check_key(event, KEY_S, KEY_DOWN)
+# Check if the player is moving up
+func down() -> bool:
+	if(Input.is_physical_key_pressed(KEY_S) && !self.disable_wasd):
+		return true
+	if(Input.is_physical_key_pressed(KEY_DOWN) && !self.disable_arrows):
+		return true
 	
-	# Joystick/Joypad
-	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
-	#JOY_AXIS_1 = 1 --- Gamepad left stick vertical axis.
-	if(event is InputEventJoypadMotion and !self.disable_joystick):
-		if event.axis == 1:
-			# variable < 0 means the player is moving down
-			# variable > 0 means the player is moving up
-			# in a 2D world
-			if event.axis_value < 0:
-				return true
+	if(Input.get_joy_axis(0, 1) > self.deadzone && !self.disable_joystick):
+		return true
 	return false
 
+# Setget deadzone
+func set_deadzone(value:float) -> void:
+	deadzone = value
+func get_deadzone() -> float:
+	return deadzone
 
 # Setget disable_wasd
 func set_disable_wasd(value:bool) -> void:
