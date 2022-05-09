@@ -6,7 +6,7 @@ var disable_joystick:bool = false setget set_disable_joystick, \
 		get_disable_joystick
 
 
-func _init(_options = {}):
+func _init(_options = {}) -> void:
 	if(_options.get("disable_wasd")):
 		self.disable_wasd = _options["disable_wasd"]
 	if(_options.get("disable_arrows")):
@@ -17,20 +17,30 @@ func _init(_options = {}):
 		self.disable_joystick = _options["disable_joypad"]
 
 
+# Checks the key pressed events, doesn't check if the arguments don't
+# exist
+func check_key(event: InputEventKey, wasd_key: int, \
+		arrow_key: int) -> bool:
+	if event.scancode == wasd_key and !self.disable_wasd:
+		return true
+	elif event.scancode == arrow_key and !self.disable_arrows:
+		return true
+	return false
+
+
 ### Player movement ###
 # I've done this because its kinda annoying changing the project
 # inputs every time we create a project
 # Reference:
 # https://docs.godotengine.org/en/stable/classes/class_%40globalscope.html#enum-globalscope-joysticklist
 # Check if the player is moving left
-func left(event) -> bool:
+func left(event: InputEvent) -> bool:
 	# Keyboard
 	if event is InputEventKey:
 		if event.pressed:
-			if event.scancode == KEY_A and !self.disable_wasd:
-				return true
-			elif event.scancode == KEY_LEFT and !self.disable_arrows:
-				return true
+			return check_key(event, KEY_A, KEY_LEFT)
+		elif event.echo:
+			return check_key(event, KEY_A, KEY_LEFT)
 	
 	# Joystick/Joypad
 	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
@@ -46,14 +56,13 @@ func left(event) -> bool:
 
 
 # Check if the player is moving right
-func right(event) -> bool:
+func right(event: InputEvent) -> bool:
 	# Keyboard
 	if event is InputEventKey:
 		if event.pressed:
-			if event.scancode == KEY_D and !self.disable_wasd:
-				return true
-			elif event.scancode == KEY_RIGHT and !self.disable_arrows:
-				return true
+			return check_key(event, KEY_D, KEY_RIGHT)
+		elif event.echo:
+			return check_key(event, KEY_D, KEY_RIGHT)
 	
 	# Joystick/Joypad
 	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
@@ -69,14 +78,13 @@ func right(event) -> bool:
 
 
 # Check if the player is moving up
-func up(event) -> bool:
+func up(event: InputEvent) -> bool:
 	# Keyboard
 	if event is InputEventKey:
 		if event.pressed:
-			if event.scancode == KEY_W and !self.disable_wasd:
-				return true
-			elif event.scancode == KEY_UP and !self.disable_arrows:
-				return true
+			return check_key(event, KEY_W, KEY_UP)
+		elif event.echo:
+			return check_key(event, KEY_W, KEY_UP)
 	
 	# Joystick/Joypad
 	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
@@ -92,14 +100,13 @@ func up(event) -> bool:
 
 
 # Check if the player is moving down
-func down(event) -> bool:
+func down(event: InputEvent) -> bool:
 	# Keyboard
 	if event is InputEventKey:
 		if event.pressed:
-			if event.scancode == KEY_S and !self.disable_wasd:
-				return true
-			elif event.scancode == KEY_DOWN and !self.disable_arrows:
-				return true
+			return check_key(event, KEY_S, KEY_DOWN)
+		if event.echo:
+			return check_key(event, KEY_S, KEY_DOWN)
 	
 	# Joystick/Joypad
 	#JOY_AXIS_0 = 0 --- Gamepad left stick horizontal axis.
