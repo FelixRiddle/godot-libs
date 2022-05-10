@@ -1,4 +1,5 @@
-class_name Sort
+class_name ArrayUtils
+
 
 ### Counting Sort ###
 static func counting_sort(input):
@@ -20,12 +21,14 @@ static func counting_sort(input):
 	
 	return output
 
+
 # Creates an array of zeros
 static func create_zero_array(length):
 	var temp = []
 	for _i in range(length):
 		temp.append(0)
 	return temp
+
 
 # Get the max number in an array
 static func get_max_number_in_array(arr):
