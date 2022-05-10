@@ -12,7 +12,6 @@ var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
 var cells:Array = [] setget set_cells, get_cells
 var length:int = 1 setget set_length, get_length
 
-
 func _init(options) -> void:
 	if(options.has("length") && typeof(options["length"]) == TYPE_INT):
 		self.length = options["length"]

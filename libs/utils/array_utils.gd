@@ -1,5 +1,26 @@
 class_name ArrayUtils
 
+# Change the size of an array, returns a dictionary
+# which in case of shrinking, contains the values of the deleted items
+static func change_length(arr:Array, new_size:int) -> Dictionary:
+	var dict = {
+		"deleted_items": [],
+		"new_array": [],
+		"old_array": arr.duplicate(),
+	}
+	
+	if(new_size < arr.size()):
+		dict["deleted_items"] = get_last_items(arr, new_size)
+		dict["new_array"] = shrink_array(arr, new_size)
+	else:
+		dict["new_array"] = increase_length(arr, new_size)
+	return dict
+
+
+static func change_size(arr:Array, new_size:int) -> Dictionary:
+	return change_length(arr, new_size)
+
+
 # Counting Sort ###
 static func counting_sort(input:Array) -> Array:
 	# k is the maximum value of the non-negative key values
@@ -74,7 +95,7 @@ static func reverse_array(arr:Array) -> Array:
 # Returns a copy of the array
 static func shrink_array(arr:Array, length:int) -> Array:
 	var new_array = arr.duplicate(true)
-	for i in range(length):
+	for _i in range(length):
 		new_array.pop_back()
 	
 	return new_array
