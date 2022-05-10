@@ -1,15 +1,14 @@
 extends Control
 
 # Scenes
-export var Cell:PackedScene = preload("res://scenes/inventory_ui" + \
+export var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
 		"/cell/cell.tscn")
-export var Hotbar:PackedScene = preload("res://scenes/inventory_ui" + \
+export var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
 		"/hotbar/hotbar.tscn")
-export var Inventory:PackedScene = preload("res://scenes/inventory_ui/" + \
-		"inventory/inventory.tscn")
+export var Inventory:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/inventory/inventory.tscn")
 
-
-var ArrayUtils = load("res://godot-libs/utils/array_utils.gd")
+var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
 var cells:Array = [] setget set_cells, get_cells
 var length:int = 1 setget set_length, get_length
 
