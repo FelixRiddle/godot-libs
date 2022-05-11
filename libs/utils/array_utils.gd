@@ -50,6 +50,14 @@ static func create_zero_array(length:int) -> Array:
 	return temp
 
 
+# Creates an array and fills it with the type provided
+static func create_array_with(type, length:int) -> Array:
+	var temp = []
+	for _i in range(length):
+		temp.append(type)
+	return temp
+
+
 # Get an array of the last items
 static func get_last_items(arr:Array, length:int) -> Array:
 	var new_arr = []
