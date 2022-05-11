@@ -1,9 +1,16 @@
-class_name InventoryManager
 extends Control
 
 signal cells_changed(old_arr, new_arr)
 signal overflowed(overflow)
 signal size_changed(old_size, new_size)
+
+var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
+var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/cell/cell.tscn")
+var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/hotbar/hotbar.tscn")
+var InventoryContainer:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/inventory/inventory.tscn")
 
 # uwu
 # The length will likely be overrided
@@ -14,18 +21,19 @@ export(int) var length:int = 1 setget set_length, get_length
 # from another script
 export(Array) var cells:Array = [] setget set_cells, get_cells
 export(PackedScene) var hotbar = Hotbar.instance()
-export(PackedScene) var inventory:PackedScene = Inventory.instance()
+export(PackedScene) var inventory = InventoryContainer.instance()
 export(Array) var overflow:Array = [] setget set_overflow, get_overflow
 
-var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
-var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/cell/cell.tscn")
-var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/hotbar/hotbar.tscn")
-var Inventory:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/inventory/inventory.tscn")
+func _init():
+	if(debug):
+		print("InventoryManager -> _init:")
+	
+	# Instantiate the cells
+	self.cells = ArrayUtils.create_array_with(Cell.instance(), \
+			self.length)
 
-func _init(options:Dictionary) -> void:
+
+func set_info(options:Dictionary) -> void:
 	if(options.has("debug") \
 			&& typeof(options["debug"]) == TYPE_BOOL):
 		self.debug = options["debug"]
@@ -36,9 +44,6 @@ func _init(options:Dictionary) -> void:
 			&& typeof(options["length"]) == TYPE_INT):
 		self.length = options["length"]
 	
-	# Instantiate the cells
-	self.cells = ArrayUtils.create_array_with(Cell.instance(), \
-			self.length)
 	
 	if(debug):
 		print("Cells: ", self.cells)
@@ -76,10 +81,13 @@ func set_length(value:int) -> void:
 	
 	if(debug):
 		print("Resizing the array...")
-	var result:Dictionary = ArrayUtils.change_size(cells, value,  Cell.instance())
+	var result:Dictionary = ArrayUtils.change_size(cells, value, \
+			Cell.instance())
+	
 	if(result.has("deleted_items")):
 		self.overflow = result["deleted_items"]
 		emit_signal("overflowed", self.overflow)
+	
 	if(result.has("new_array")):
 		var old_cells = self.cells
 		self.cells = result["new_array"]

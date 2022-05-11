@@ -11,15 +11,15 @@ static func change_length(arr:Array, new_size:int, element = 0) -> Dictionary:
 	}
 	
 	if(new_size < arr.size()):
-		dict["deleted_items"] = get_last_items(arr, new_size)
-		dict["new_array"] = shrink_array(arr, new_size)
+		dict["deleted_items"] = get_last_items(arr, arr.size() - new_size)
+		dict["new_array"] = shrink_array(arr, arr.size() - new_size)
 	else:
 		dict["new_array"] = increase_length(arr, new_size, element)
 	return dict
 
 
-static func change_size(arr:Array, new_size:int) -> Dictionary:
-	return change_length(arr, new_size)
+static func change_size(arr:Array, new_size:int, element = 0) -> Dictionary:
+	return change_length(arr, new_size, element)
 
 
 # Counting Sort
@@ -110,3 +110,70 @@ static func shrink_array(arr:Array, length:int) -> Array:
 		new_array.pop_back()
 	
 	return new_array
+
+
+# The same change_length, except that this one tries to detect if the element
+# is a path or a class
+static func smart_change_length(arr:Array, \
+			new_size:int, element = 0, _options = {}) -> Dictionary:
+	var dict = {
+		"deleted_items": [],
+		"new_array": [],
+		"old_array": arr.duplicate(),
+	}
+	
+	if(new_size < arr.size()):
+		dict["deleted_items"] = get_last_items(arr, arr.size() - new_size)
+		dict["new_array"] = shrink_array(arr, arr.size() - new_size)
+	else:
+		dict["new_array"] = smart_increase_length(\
+				arr, new_size - arr.size(), element, _options)
+	return dict
+
+
+static func smart_change_size(arr:Array, new_size:int, \
+			element = 0, _options = {}) -> Dictionary:
+	return smart_change_length(arr, new_size, element, _options)
+
+
+# Create an array, but smart xD
+static func smart_create_array_with(element, \
+			length:int, _options = {}) -> Array:
+	var temp_arr = []
+	var Utils = preload("res://godot-libs/libs/utils/utils.gd")
+	
+	var type:String = Utils.get_resource_type(element)
+	var el = Utils.load_resource(element)
+	
+	for _i in range(length):
+		# Depending on the type there will be different methods
+		# for instancing it
+		if(type == "scene"):
+			temp_arr.append(el.instance())
+		elif(type == "script"):
+			# Check if there were arguments provided
+			if(_options.has("arg")):
+				temp_arr.append(el.new(_options["arg"]))
+			else:
+				temp_arr.append(el.new())
+		else:
+			temp_arr.append(el)
+	return temp_arr
+
+
+# Increase the size/length of the array
+# The third argument is the object to populate the array with
+# _options can have:
+# args: For instantiating classes
+static func smart_increase_length(arr:Array, \
+			length:int, element = 0, _options = {}) -> Array:
+	# The argument that takes Array.duplicate(bool) is for
+	# doing a deep duplication where there will be no references
+	var temp_arr:Array = arr.duplicate(true)
+	
+	# Create a new array with the elements and append it to temp_arr
+	var append_items = smart_create_array_with(\
+			element, length, _options)
+	temp_arr.append_array(append_items)
+	
+	return temp_arr

@@ -15,7 +15,7 @@ var items = {} setget set_items, get_items
 export(int) var size:int = 10 setget set_size, get_size
 
 # Constructor
-func _init(_options):
+func _init(_options = {}):
 	if(_options.debug): self.debug = _options.debug
 	
 	if(debug): print("Constructor")
@@ -42,8 +42,8 @@ func set_items(value):
 func get_items():
 	return items.duplicate()
 
-func add(item: Item, amount: int = 1):
-	pass
+#func add(item: Item, amount: int = 1):
+#	pass
 
 # Add item by its id
 # This functions adds an item by searching its id on the ItemsDatabase
