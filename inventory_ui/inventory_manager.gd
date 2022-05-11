@@ -1,26 +1,47 @@
+class_name InventoryManager
 extends Control
 
-# Scenes
-export var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/cell/cell.tscn")
-export var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/hotbar/hotbar.tscn")
-export var Inventory:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/inventory/inventory.tscn")
+signal cells_changed(old_arr, new_arr)
+signal overflowed(overflow)
+signal size_changed(old_size, new_size)
+
+# uwu
+# The length will likely be overrided
+export(bool) var debug:bool = false setget set_debug, get_debug
+export(int) var length:int = 1 setget set_length, get_length
+
+# Do not edit in editor, these are exported to be accesed
+# from another script
+export(Array) var cells:Array = [] setget set_cells, get_cells
+export(PackedScene) var hotbar = Hotbar.instance()
+export(PackedScene) var inventory:PackedScene = Inventory.instance()
+export(Array) var overflow:Array = [] setget set_overflow, get_overflow
 
 var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
-var cells:Array = [] setget set_cells, get_cells
-var hotbar = Hotbar.instance()
-var inventory = Inventory.instance()
-var length:int = 1 setget set_length, get_length
+var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/cell/cell.tscn")
+var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/hotbar/hotbar.tscn")
+var Inventory:PackedScene = preload("res://godot-libs/inventory_ui" + \
+		"/inventory/inventory.tscn")
 
-
-func _init(options) -> void:
-	if(options.has("length") && typeof(options["length"]) == TYPE_INT):
+func _init(options:Dictionary) -> void:
+	if(options.has("debug") \
+			&& typeof(options["debug"]) == TYPE_BOOL):
+		self.debug = options["debug"]
+	if(debug):
+		print("InventoryManager -> _init:")
+	
+	if(options.has("length") \
+			&& typeof(options["length"]) == TYPE_INT):
 		self.length = options["length"]
 	
 	# Instantiate the cells
-	self.cells = ArrayUtils.create_zero_array(self.length)
+	self.cells = ArrayUtils.create_array_with(Cell.instance(), \
+			self.length)
+	
+	if(debug):
+		print("Cells: ", self.cells)
 
 
 # setget cells
@@ -34,15 +55,48 @@ func get_cells() -> Array:
 	return cells
 
 
+# setget debug
+func set_debug(value:bool) -> void:
+	debug = value
+
+
+func get_debug() -> bool:
+	return debug
+
+
 # setget length
-func set_length(value) -> void:
-	if(typeof(value) != TYPE_INT):
-		return
+# When shrinking the array, it will store the deleted cells in
+# the overflow variable
+func set_length(value:int) -> void:
+	if(debug):
+		print("InventoryManager -> set_length:")
+	var old_length:int = length
 	length = value
+	emit_signal("size_changed", old_length, length)
 	
-	# TODO: Shrink or increase cells
-	# ...
+	if(debug):
+		print("Resizing the array...")
+	var result:Dictionary = ArrayUtils.change_size(cells, value,  Cell.instance())
+	if(result.has("deleted_items")):
+		self.overflow = result["deleted_items"]
+		emit_signal("overflowed", self.overflow)
+	if(result.has("new_array")):
+		var old_cells = self.cells
+		self.cells = result["new_array"]
+		emit_signal("cells_changed", old_cells, self.cells)
+	
+	if(debug):
+		print("Result: ", result)
 
 
 func get_length() -> int:
 	return length
+
+
+# setget overflow
+func set_overflow(value) -> void:
+	overflow = value
+
+
+func get_overflow() -> Array:
+	return overflow

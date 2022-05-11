@@ -2,7 +2,8 @@ class_name ArrayUtils
 
 # Change the size of an array, returns a dictionary
 # which in case of shrinking, contains the values of the deleted items
-static func change_length(arr:Array, new_size:int) -> Dictionary:
+# The third argument is the object to populate the array with
+static func change_length(arr:Array, new_size:int, element = 0) -> Dictionary:
 	var dict = {
 		"deleted_items": [],
 		"new_array": [],
@@ -13,7 +14,7 @@ static func change_length(arr:Array, new_size:int) -> Dictionary:
 		dict["deleted_items"] = get_last_items(arr, new_size)
 		dict["new_array"] = shrink_array(arr, new_size)
 	else:
-		dict["new_array"] = increase_length(arr, new_size)
+		dict["new_array"] = increase_length(arr, new_size, element)
 	return dict
 
 
@@ -21,7 +22,8 @@ static func change_size(arr:Array, new_size:int) -> Dictionary:
 	return change_length(arr, new_size)
 
 
-# Counting Sort ###
+# Counting Sort
+# It assumes that the input is an array of integers
 static func counting_sort(input:Array) -> Array:
 	# k is the maximum value of the non-negative key values
 	var k = get_max_number_in_array(input)
@@ -75,19 +77,20 @@ static func get_max_number_in_array(arr:Array) -> int:
 
 
 # Increase the size/length of the array
-static func increase_length(arr:Array, length:int) -> Array:
+# The third argument is the object to populate the array with
+static func increase_length(arr:Array, length:int, element = 0) -> Array:
 	# The argument that takes Array.duplicate(bool) is for
 	# doing a deep duplication where there will be no references
 	var temp_arr:Array = arr.duplicate(true)
 	for _i in range(length):
-		temp_arr.append(0)
+		temp_arr.append(element)
 	
 	return temp_arr
 
 
 # Alias for increase_length
-static func increase_size(arr:Array, length:int) -> Array:
-	return increase_length(arr, length)
+static func increase_size(arr:Array, length:int, element = 0) -> Array:
+	return increase_length(arr, length, element)
 
 
 # Reverse an array
