@@ -9,10 +9,9 @@ var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
 		"/cell/cell.tscn")
 var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
 		"/hotbar/hotbar.tscn")
-var InventoryContainer:PackedScene = preload("res://godot-libs/inventory_ui" + \
-		"/inventory/inventory.tscn")
+var InventoryContainer:PackedScene = preload(
+		"res://godot-libs/inventory_ui/inventory/inventory.tscn")
 
-# uwu
 # The length will likely be overrided
 export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 1 setget set_length, get_length
@@ -27,10 +26,6 @@ export(Array) var overflow:Array = [] setget set_overflow, get_overflow
 func _init():
 	if(debug):
 		print("InventoryManager -> _init:")
-	
-	# Instantiate the cells
-	self.cells = ArrayUtils.create_array_with(Cell.instance(), \
-			self.length)
 
 
 func set_info(options:Dictionary) -> void:
@@ -81,8 +76,8 @@ func set_length(value:int) -> void:
 	
 	if(debug):
 		print("Resizing the array...")
-	var result:Dictionary = ArrayUtils.change_size(cells, value, \
-			Cell.instance())
+	var result:Dictionary = ArrayUtils.smart_change_length(
+			cells, value, Cell)
 	
 	if(result.has("deleted_items")):
 		self.overflow = result["deleted_items"]
@@ -94,7 +89,11 @@ func set_length(value:int) -> void:
 		emit_signal("cells_changed", old_cells, self.cells)
 	
 	if(debug):
-		print("Result: ", result)
+		print("New array: ", self.cells)
+
+
+func set_inv_size(value:int):
+	return set_length(value)
 
 
 func get_length() -> int:

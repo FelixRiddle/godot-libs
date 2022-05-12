@@ -16,7 +16,8 @@ export(int) var size:int = 10 setget set_size, get_size
 
 # Constructor
 func _init(_options = {}):
-	if(_options.debug): self.debug = _options.debug
+	if(_options.has("debug")):
+		self.debug = _options.debug
 	
 	if(debug): print("Constructor")
 	# If it's already connected, it would throw an error if we try to connect

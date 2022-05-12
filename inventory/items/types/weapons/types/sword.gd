@@ -8,13 +8,15 @@ class_name Sword
 #var class_path = "res://Scripts/Inventory/Items/Types/Weapons/" + \
 #	"Types/Sword.gd"
 
+
 # Constructor
 func _init(_data, _options):
-	if(_data.get("debug")):
+	if(_data.has("debug")):
 		print("Sword.gd -> _init(_data, _options):")
 	
 	set_info(_data)
 	set_sword_info(_data)
+
 
 ### Functions/Methods ###
 # Set sword info
@@ -23,8 +25,9 @@ func set_sword_info(item):
 		print("Sword.gd -> set_sword_info(item):")
 	
 	if(item):
-		if(item.get("damage")):
+		if(item.has("damage")):
 			self.item_damage = item["damage"]
+
 
 ### Methods/Functions ###
 # Return variables in as a dictionary

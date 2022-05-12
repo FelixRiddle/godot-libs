@@ -20,6 +20,7 @@ static func get_resource_type(res) -> String:
 	
 	return type
 
+
 # Try to load resource at a the provided path, if not posible
 # returns the same value
 static func load_resource(res):
@@ -39,3 +40,11 @@ static func load_resource(res):
 		el = res
 	
 	return el
+
+
+# Print a property of every item in the array
+func print_arr_item_props(arr:Array, prop_name:String) -> void:
+	for i in range(arr.size()):
+		var curr = arr[i]
+		if(curr is Object && curr.get(prop_name)):
+			print(prop_name, "(", i, "): ", curr[prop_name])

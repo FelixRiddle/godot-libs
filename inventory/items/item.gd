@@ -41,6 +41,7 @@ func add(amount):
 	item_amount += amount
 	return true
 
+
 # Create a new by a given dictionary of stats
 static func create_item_by_dict(item):
 	var temp_debug = item.get("debug") && item["debug"]
@@ -66,6 +67,7 @@ static func create_item_by_dict(item):
 		
 		return ItemClass.new(item, null)
 
+
 # Drop items
 # item_dict: Result of the method call get_as_dict()
 # amount: Amount of items to drop
@@ -83,6 +85,7 @@ func drop(item_dict, amount):
 	
 	return null
 
+
 # Drop overflow
 func drop_overflow():
 	if(debug):
@@ -95,6 +98,7 @@ func drop_overflow():
 		return _overflow
 	else:
 		return null
+
 
 # Find by id
 static func find_by_id(id):
@@ -116,9 +120,11 @@ static func find_by_id(id):
 	# which means it's not a predefined item
 	return null
 
+
 # Get as dict, overridable
 func get_as_dict():
 	return _get_item_stats_as_dict()
+
 
 # Get item stats as dictionary
 func _get_item_stats_as_dict():
@@ -150,12 +156,14 @@ func _get_item_stats_as_dict():
 	
 	return result
 
+
 # Find item
 static func find(item):
 	if(item.get("item_id")):
 		return find_by_id(item["item_id"])
 	else:
 		return null
+
 
 # Set info shorthand
 # item_dict:
@@ -199,6 +207,7 @@ func set_info(item_dict):
 	
 	return null
 
+
 ### Amount
 func set_amount(value):
 	if(debug):
@@ -229,15 +238,18 @@ func set_amount(value):
 func get_amount():
 	return item_amount
 
+
 # Get space available
 func get_space_available():
 	return item_capacity - item_amount
+
 
 ### Capacity
 func set_capacity(value):
 	item_capacity = value
 func get_capacity():
 	return item_capacity
+
 
 # Check if the item has space
 func has_space():
@@ -246,11 +258,13 @@ func has_space():
 	else:
 		return false
 
+
 ### Class id
 func set_class_id(value):
 	class_id = value
 func get_class_id():
 	return class_id
+
 
 ### Class path
 func set_class_path(value):
@@ -258,11 +272,13 @@ func set_class_path(value):
 func get_class_path():
 	return class_path
 
+
 ### Debug
 func set_debug(value):
 	debug = value
 func get_debug():
 	return debug
+
 
 ### Item description
 func set_description(value):
@@ -270,11 +286,13 @@ func set_description(value):
 func get_description():
 	return item_description
 
+
 ### ID
 func set_id(value):
 	item_id = value
 func get_id():
 	return item_id
+
 
 ### Item name
 func set_name(value):
@@ -282,17 +300,20 @@ func set_name(value):
 func get_name():
 	return item_name
 
+
 ### Overflow
 func set_overflow(value):
 	overflow = value
 func get_overflow():
 	return overflow
 
+
 ### Scene
 func set_scene_path(value):
 	scene_path = value
 func get_scene_path():
 	return scene_path
+
 
 ### Item slot
 func set_slot(value):
@@ -307,17 +328,20 @@ func set_slot(value):
 func get_slot():
 	return item_slot
 
+
 ### Subtype
 func set_subtype(value):
 	item_subtype = value
 func get_subtype():
 	return item_subtype
 
+
 ### Item type
 func set_type(value):
 	item_type = value
 func get_type():
 	return item_type
+
 
 ### UUID
 func get_uuid():
