@@ -2,7 +2,7 @@
 
 [ext_resource path="res://godot-libs/inventory_ui/cell/cell.gd" type="Script" id=1]
 
-[node name="Control" type="Control"]
+[node name="Cell" type="Control"]
 anchor_right = 0.0683594
 anchor_bottom = 0.116667
 script = ExtResource( 1 )

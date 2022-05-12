@@ -1,9 +1,5 @@
 extends Control
 
-signal cells_changed(old_arr, new_arr)
-signal overflowed(overflow)
-signal size_changed(old_size, new_size)
-
 var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
 		"/cell/cell.tscn")
@@ -11,29 +7,45 @@ var Hotbar:PackedScene = preload("res://godot-libs/inventory_ui" + \
 		"/hotbar/hotbar.tscn")
 var InventoryContainer:PackedScene = preload(
 		"res://godot-libs/inventory_ui/inventory/inventory.tscn")
+var InventoryScript = preload("res://godot-libs/inventory/inventory.gd")
+
+signal cells_changed(old_arr, new_arr)
+signal overflowed(overflow)
+signal size_changed(old_size, new_size)
 
 # The length will likely be overrided
 export(bool) var debug:bool = false setget set_debug, get_debug
-export(int) var length:int = 1 setget set_length, get_length
+export(int) var length:int = 0 setget set_length, get_length
 
-# Do not edit in editor, these are exported to be accesed
-# from another script
-export(Array) var cells:Array = [] setget set_cells, get_cells
-export(PackedScene) var hotbar = Hotbar.instance()
-export(PackedScene) var inventory = InventoryContainer.instance()
-export(Array) var overflow:Array = [] setget set_overflow, get_overflow
+var cells:Array = [] setget set_cells, get_cells
+var hotbar = Hotbar.instance()
+var inventory = InventoryScript.new() setget set_inventory, get_inventory
+var inventory_container = InventoryContainer.instance()
+var overflow:Array = [] setget set_overflow, get_overflow
 
 func _init():
 	if(debug):
 		print("InventoryManager -> _init:")
+	
+	# Add to the scene tree
+	add_child(hotbar)
+	add_child(inventory_container)
+	
+	# Connect to the cells changed for instancing and destroying cells
+	var connect_result = connect(
+			"cells_changed", self, "_on_inventory_manager_cells_changed")
+	
+	if(debug):
+		print("Connect result: ", connect_result)
 
 
 func set_info(options:Dictionary) -> void:
 	if(options.has("debug") \
 			&& typeof(options["debug"]) == TYPE_BOOL):
 		self.debug = options["debug"]
+		inventory.debug = options["debug"]
 	if(debug):
-		print("InventoryManager -> _init:")
+		print("InventoryManager -> set_info:")
 	
 	if(options.has("length") \
 			&& typeof(options["length"]) == TYPE_INT):
@@ -49,8 +61,6 @@ func set_cells(value) -> void:
 	if(typeof(value) != TYPE_ARRAY):
 		return
 	cells = value
-
-
 func get_cells() -> Array:
 	return cells
 
@@ -58,10 +68,14 @@ func get_cells() -> Array:
 # setget debug
 func set_debug(value:bool) -> void:
 	debug = value
-
-
 func get_debug() -> bool:
 	return debug
+
+
+func set_inventory(value:Inventory) -> void:
+	inventory = value
+func get_inventory() -> Inventory:
+	return inventory
 
 
 # setget length
@@ -90,20 +104,27 @@ func set_length(value:int) -> void:
 	
 	if(debug):
 		print("New array: ", self.cells)
+func get_length() -> int:
+	return length
 
 
 func set_inv_size(value:int):
 	return set_length(value)
 
 
-func get_length() -> int:
-	return length
-
-
 # setget overflow
 func set_overflow(value) -> void:
 	overflow = value
-
-
 func get_overflow() -> Array:
 	return overflow
+
+
+### Signals
+func _on_inventory_manager_cells_changed(old_arr:Array = [], \
+			new_arr:Array = []):
+	
+	# Remove old slots from the array
+	
+	# Add new slots to the array
+	
+	pass

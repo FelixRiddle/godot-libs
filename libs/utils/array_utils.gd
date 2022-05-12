@@ -63,6 +63,8 @@ static func create_array_with(type, length:int) -> Array:
 # Get an array of the last items
 static func get_last_items(arr:Array, length:int) -> Array:
 	var new_arr = []
+	if(arr.size() - 1 < 0):
+		return arr
 	for i in range(length):
 		new_arr.push_back(arr[(arr.size() - 1) - i])
 	return new_arr
