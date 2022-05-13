@@ -9,8 +9,7 @@ anchor_right = 0.680664
 anchor_bottom = 0.67
 script = ExtResource( 1 )
 __meta__ = {
-"_edit_lock_": true,
-"_edit_use_anchors_": true
+"_edit_lock_": true
 }
 
 [node name="BackgroundColor" type="ColorRect" parent="."]
@@ -30,8 +29,13 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="GridContainer" type="GridContainer" parent="BackgroundColor/HSplitContainer"]
+[node name="Panel" type="Panel" parent="BackgroundColor/HSplitContainer"]
 margin_right = 428.0
+margin_bottom = 267.0
+
+[node name="GridContainer" type="GridContainer" parent="BackgroundColor/HSplitContainer/Panel"]
+margin_left = 440.0
+margin_right = 455.0
 margin_bottom = 267.0
 
 [node name="VScrollBar" type="VScrollBar" parent="BackgroundColor/HSplitContainer"]

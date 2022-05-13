@@ -1,4 +1,4 @@
-extends Control
+extends CanvasLayer
 
 var ArrayUtils = preload("res://godot-libs/libs/utils/array_utils.gd")
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui" + \
