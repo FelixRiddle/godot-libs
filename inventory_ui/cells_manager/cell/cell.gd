@@ -12,6 +12,10 @@ extends Control
 #     [] Left
 #     [] Up
 
+signal updated
+
+var updated:bool = false setget set_updated, get_updated
+
 # Notifications
 func _notification(what):
 	match what:
@@ -35,3 +39,13 @@ func _notification(what):
 		NOTIFICATION_MODAL_CLOSE:
 			pass # For modal pop-ups, notification
 			# that the pop-up was closed.
+
+
+# setget updated
+func set_updated(value:bool) -> void:
+	updated = value
+	
+	if(self.updated):
+		emit_signal("updated")
+func get_updated() -> bool:
+	return updated

@@ -6,6 +6,13 @@ extends Control
 #   [] Lock/Unlock item
 #   [] Drop item
 
+var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
+		"cells_manager/cells_manager.gd").new({
+				"debug": true,
+				"length": 0,
+				"node_ref": self,
+		}) setget , get_cells_manager
+
 # Notifications
 func _notification(what):
 	match what:
@@ -29,3 +36,11 @@ func _notification(what):
 		NOTIFICATION_MODAL_CLOSE:
 			pass # For modal pop-ups, notification
 			# that the pop-up was closed.
+
+
+func get_cells_manager():
+	return cells_manager
+
+
+func get_inventory():
+	return self.cells_manager.inventory

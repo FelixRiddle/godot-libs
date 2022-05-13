@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://godot-libs/inventory_ui/cell/cell.gd" type="Script" id=1]
+[ext_resource path="res://godot-libs/inventory_ui/cells_manager/cell/cell.gd" type="Script" id=1]
 
 [node name="Cell" type="Control"]
 anchor_right = 0.0683594

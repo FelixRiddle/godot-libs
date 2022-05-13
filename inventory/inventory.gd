@@ -1,3 +1,7 @@
+# Inventory interface for item management
+# This is an interface for an inventory with minecraft, terraria-like type
+# of inventory
+
 # The name of this class
 class_name Inventory
 
@@ -5,7 +9,8 @@ class_name Inventory
 var Item = load("res://godot-libs/inventory/items/item.gd")
 
 # Signals
-signal inventory_changed
+# The new inv is a reference to the actual inventory, remember that
+signal inventory_changed(old_inv, new_inv_ref)
 signal item_removed(item)
 signal item_added(item)
 
@@ -410,11 +415,14 @@ func _insert_item(item):
 	if(!item):
 		if(debug): print("Warning: The item is null: ", item)
 	elif(item.get("uuid")):
+		# The argument here is to make a "deep" copy of the dictionary
+		var old_inventory = items.duplicate(true)
+		
 		# Insert the item in the items dictionary
 		self.items[item["uuid"]] = item
 		
 		emit_signal("item_added", item)
-		emit_signal("inventory_changed")
+		emit_signal("inventory_changed", old_inventory, items)
 		return item
 	elif(debug):
 		print("Warning: The new item doesn't have an uuid?, item:")
