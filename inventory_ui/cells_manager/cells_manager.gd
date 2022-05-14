@@ -126,8 +126,8 @@ func set_length(value:int) -> void:
 		emit_signal("cells_changed", old_cells, self.cells)
 	
 	# Remove previous overflow
-	for i in range(cells.duplicate().size()):
-		cells[i].queue_free()
+	for i in range(self.overflow.duplicate().size()):
+		self.overflow[i].queue_free()
 	
 	if(result.has("deleted_items")):
 		self.overflow = result["deleted_items"]
