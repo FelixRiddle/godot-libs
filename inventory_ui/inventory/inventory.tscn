@@ -21,24 +21,47 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="HSplitContainer" type="HSplitContainer" parent="BackgroundColor"]
+[node name="TabContainer" type="TabContainer" parent="BackgroundColor"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+tab_align = 0
+
+[node name="Inventory" type="Control" parent="BackgroundColor/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="HSplitContainer" type="HSplitContainer" parent="BackgroundColor/TabContainer/Inventory"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 split_offset = 428
-__meta__ = {
-"_edit_lock_": true
-}
 
-[node name="Panel" type="Panel" parent="BackgroundColor/HSplitContainer"]
-margin_right = 428.0
-margin_bottom = 267.0
+[node name="Panel" type="Panel" parent="BackgroundColor/TabContainer/Inventory/HSplitContainer"]
+margin_right = 423.0
+margin_bottom = 231.0
 
-[node name="GridContainer" type="GridContainer" parent="BackgroundColor/HSplitContainer/Panel"]
-margin_left = 440.0
-margin_right = 455.0
-margin_bottom = 267.0
+[node name="VScrollBar" type="VScrollBar" parent="BackgroundColor/TabContainer/Inventory/HSplitContainer"]
+margin_left = 435.0
+margin_right = 447.0
+margin_bottom = 231.0
 
-[node name="VScrollBar" type="VScrollBar" parent="BackgroundColor/HSplitContainer"]
-margin_left = 440.0
-margin_right = 452.0
-margin_bottom = 267.0
+[node name="Equipment" type="Control" parent="BackgroundColor/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Panel" type="Panel" parent="BackgroundColor/TabContainer/Equipment"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Quests" type="Control" parent="BackgroundColor/TabContainer"]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0

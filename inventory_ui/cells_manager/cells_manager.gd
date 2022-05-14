@@ -125,7 +125,7 @@ func set_length(value:int) -> void:
 		
 		emit_signal("cells_changed", old_cells, self.cells)
 	
-	# Remove previous overflow
+	# Remove previous overflow cells from the scene tree
 	for i in range(self.overflow.duplicate().size()):
 		self.overflow[i].queue_free()
 	

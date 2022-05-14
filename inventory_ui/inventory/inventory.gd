@@ -19,8 +19,8 @@ func _ready():
 				"info": {
 					"debug": true,
 					"length": 0,
-					"node_ref": get_node("BackgroundColor/HSplitContainer" + \
-							"/Panel/GridContainer"),
+					"node_ref": get_node("BackgroundColor/TabContainer/" + \
+							"Inventory/HSplitContainer/Panel"),
 				},
 		})
 
