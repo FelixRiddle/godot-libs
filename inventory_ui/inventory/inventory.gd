@@ -11,11 +11,14 @@ extends Control
 #     [] Left
 #     [] Up
 
-var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
+onready var cells_manager = load( "res://godot-libs/inventory_ui/" + \
 		"cells_manager/cells_manager.gd").new({
-				"debug": true,
-				"length": 0,
-				"node_ref": self,
+				"info": {
+					"debug": true,
+					"length": 0,
+					"node_ref": get_node("BackgroundColor/HSplitContainer" + \
+							"/Panel/GridContainer"),
+				},
 		}) setget , get_cells_manager
 
 # Notifications

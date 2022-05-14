@@ -16,6 +16,7 @@ export(int) var length:int = 0 setget set_length, get_length
 var cells:Array = [] setget set_cells, get_cells
 var inventory = InventoryScript.new() setget set_inventory, get_inventory
 var node_ref setget set_node_ref, get_node_ref
+var overflow:Array setget set_overflow, get_overflow
 
 # Constructor
 # info is a dictionary containing values for this object properties
@@ -26,14 +27,14 @@ func _init(options:Dictionary = { "info": { } }):
 	
 	# Connect inventory changed
 	inventory.connect("inventory_changed", self, \
-			"_on_Inventory_inventory_changed")
+			"_on_inventory_inventory_changed")
+	
+	# Connect size changed
+	inventory.connect("size_changed", self, "_on_inventory_size_changed")
 	
 	# Connect to the cells changed for instancing and destroying cells
-	var connect_result = connect(
+	var _connect_result = connect(
 			"cells_changed", self, "_on_inventory_manager_cells_changed")
-	
-	if(debug):
-		print("Connect result: ", connect_result)
 	
 	# Set info
 	if(options.has("info") && typeof(options["info"]) == TYPE_DICTIONARY):
@@ -60,8 +61,10 @@ func set_info(options:Dictionary) -> void:
 			&& typeof(options["debug"]) == TYPE_BOOL):
 		self.debug = options["debug"]
 		inventory.debug = options["debug"]
+	
 	if(debug):
 		print("InventoryManager -> set_info:")
+		print("Information given: ", options)
 	
 	# Set length/size
 	if((options.has("length") \
@@ -100,29 +103,35 @@ func set_length(value:int) -> void:
 	if(debug):
 		print("Resizing the array...")
 	var result:Dictionary = ArrayUtils.smart_change_length(
-			cells, value, Cell)
+			cells, value, Cell, { "debug": self.debug, })
+	
+	if(debug):
+		print("Result: ", result)
 	
 	if(result.has("new_array")):
 		var old_cells = self.cells.duplicate(true)
 		self.cells = result["new_array"]
 		
-		# Add cells to the scene tree
-		for cell in self.cells:
-			cell.updated = true
-			node_ref.add_child(cell)
+		if(node_ref):
+			# Add cells to the scene tree
+			for cell in self.cells:
+				cell.updated = true
+				node_ref.add_child(cell)
+			
+			if(debug):
+				print("Added cells to the scene!")
+		elif(debug):
+			print("Reference doesn't exist!")
 		
 		emit_signal("cells_changed", old_cells, self.cells)
 	
 	# Remove previous overflow
-	for cell in cells:
-		cell.queue_free()
+	for i in range(cells.duplicate().size()):
+		cells[i].queue_free()
 	
 	if(result.has("deleted_items")):
 		self.overflow = result["deleted_items"]
 		emit_signal("overflow_changed", self.overflow)
-	
-	if(debug):
-		print("New array: ", self.cells)
 func get_length() -> int:
 	return length
 
@@ -133,9 +142,15 @@ func get_node_ref():
 	return node_ref
 
 
+func set_overflow(value:Array) -> void:
+	overflow = value
+func get_overflow() -> Array:
+	return overflow
+
+
 ### Signals
 func _on_inventory_manager_cells_changed(old_arr:Array = [], \
-			new_arr:Array = []):
+			new_arr:Array = []) -> void:
 	# Remove old slots from the array
 	
 	# Add new cells to the array
@@ -144,7 +159,11 @@ func _on_inventory_manager_cells_changed(old_arr:Array = [], \
 
 
 # When there are items added or removed from inventory
-func _on_Inventory_inventory_changed(old_inv:Dictionary = {},
-			new_inv_ref:Dictionary = {}):
+func _on_inventory_inventory_changed(old_inv:Dictionary = {},
+			new_inv_ref:Dictionary = {}) -> void:
 	
 	pass
+
+# When the inventory length/size changes
+func _on_inventory_size_changed(old_size:int, new_size:int) -> void:
+	set_length(new_size)

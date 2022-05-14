@@ -15,6 +15,8 @@ static func get_resource_type(res) -> String:
 			type = "scene"
 		if(res.ends_with(".gd")): # It's a script
 			type = "script"
+	elif(res is PackedScene):
+		type = "scene"
 	else:
 		type = "unknown"
 	

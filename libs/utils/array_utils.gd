@@ -116,20 +116,29 @@ static func shrink_array(arr:Array, length:int) -> Array:
 
 # The same change_length, except that this one tries to detect if the element
 # is a path or a class
-static func smart_change_length(arr:Array, \
-			new_size:int, element = 0, _options = {}) -> Dictionary:
+static func smart_change_length(arr:Array, new_size:int, element = 0, \
+			options = { "debug": false, }) -> Dictionary:
+	
 	var dict = {
 		"deleted_items": [],
 		"new_array": [],
 		"old_array": arr.duplicate(),
 	}
 	
+	if(options.has("debug")):
+		if(typeof(options["debug"]) == TYPE_BOOL):
+			if(options["debug"]):
+				print("ArrayUtils -> smart_increase_length:")
+		else:
+			dict["new_array"] = arr
+			return dict
+	
 	if(new_size < arr.size()):
 		dict["deleted_items"] = get_last_items(arr, arr.size() - new_size)
 		dict["new_array"] = shrink_array(arr, arr.size() - new_size)
 	else:
 		dict["new_array"] = smart_increase_length(\
-				arr, new_size - arr.size(), element, _options)
+				arr, new_size - arr.size(), element, options)
 	return dict
 
 
@@ -140,26 +149,42 @@ static func smart_change_size(arr:Array, new_size:int, \
 
 # Create an array, but smart xD
 static func smart_create_array_with(element, \
-			length:int, _options = {}) -> Array:
+			length:int, options = { "debug": false }) -> Array:
+	var debug = options["debug"]
+	if(debug):
+		print("ArrayUtils -> smart_create_array_with:")
+	
 	var temp_arr = []
 	var Utils = preload("res://godot-libs/libs/utils/utils.gd")
 	
 	var type:String = Utils.get_resource_type(element)
 	var el = Utils.load_resource(element)
+	var fallback = false
+	
+	if(debug):
+		print("Type: ", type)
 	
 	for _i in range(length):
 		# Depending on the type there will be different methods
 		# for instancing it
 		if(type == "scene"):
-			temp_arr.append(el.instance())
+			var scene_instance = el.instance()
+			temp_arr.append(scene_instance)
 		elif(type == "script"):
 			# Check if there were arguments provided
-			if(_options.has("arg")):
-				temp_arr.append(el.new(_options["arg"]))
+			if(options.has("arg")):
+				temp_arr.append(el.new(options["arg"]))
 			else:
 				temp_arr.append(el.new())
 		else:
 			temp_arr.append(el)
+			
+			# We don't know what type of object/node we inserted, so for
+			# easy debugging, we are going to print a message later
+			fallback = true
+	
+	if(debug && fallback):
+		print("Inserted object/s of unknown type")
 	return temp_arr
 
 
@@ -168,14 +193,22 @@ static func smart_create_array_with(element, \
 # _options can have:
 # args: For instantiating classes
 static func smart_increase_length(arr:Array, \
-			length:int, element = 0, _options = {}) -> Array:
+			length:int, element = 0, options = { "debug": false }) -> Array:
+	
+	if(options.has("debug")):
+		if(typeof(options["debug"]) == TYPE_BOOL):
+			if(options["debug"]):
+				print("ArrayUtils -> smart_increase_length:")
+		else:
+			return arr
+	
 	# The argument that takes Array.duplicate(bool) is for
 	# doing a deep duplication where there will be no references
 	var temp_arr:Array = arr.duplicate(true)
 	
 	# Create a new array with the elements and append it to temp_arr
 	var append_items = smart_create_array_with(\
-			element, length, _options)
+			element, length, options)
 	temp_arr.append_array(append_items)
 	
 	return temp_arr

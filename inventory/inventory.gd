@@ -13,6 +13,7 @@ var Item = load("res://godot-libs/inventory/items/item.gd")
 signal inventory_changed(old_inv, new_inv_ref)
 signal item_removed(item)
 signal item_added(item)
+signal size_changed(old_size, new_size)
 
 # Properties
 export(bool) var debug:bool = false setget set_debug, get_debug
@@ -465,10 +466,15 @@ func _search_and_add(items_arr, amount):
 	return amount
 
 ### Size
-func set_size(value):
+func set_size(value:int) -> void:
+	var old_size = self.size
 	size = value
-func get_size():
+	
+	emit_signal("size_changed", old_size, self.size)
+func get_size() -> int:
 	return size
+func set_length(value) -> void:
+	set_size(value)
 
 ### Signals ###
 # new_item: Instance of Item class

@@ -10,11 +10,8 @@ func _init():
 		print("InventoryManager -> _init:")
 	
 	# Connect to the cells changed for instancing and destroying cells
-	var connect_result = connect(
+	var _connect_result = connect(
 			"cells_changed", self, "_on_inventory_manager_cells_changed")
-	
-	if(debug):
-		print("Connect result: ", connect_result)
 
 
 # Add inventory scene
