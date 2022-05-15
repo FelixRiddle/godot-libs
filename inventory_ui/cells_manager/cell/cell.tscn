@@ -3,9 +3,9 @@
 [ext_resource path="res://godot-libs/inventory_ui/cells_manager/cell/cell.gd" type="Script" id=1]
 
 [node name="Control" type="Control"]
-anchor_right = 0.0683594
-anchor_bottom = 0.116667
-rect_min_size = Vector2( 70, 70 )
+anchor_right = 0.05
+anchor_bottom = 0.0853334
+rect_min_size = Vector2( 51.2, 51.2 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": true

@@ -12,6 +12,16 @@ var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
 				"length": 0,
 				"node_ref": self,
 		}) setget , get_cells_manager
+var debug:bool = false setget set_debug, get_debug
+var debug_first_half:String = "Inventory(ui) -> "
+
+func _init(options = { "debug": false, }) -> void:
+	# Check if it has debug also check if the type is boolean
+	if(options.has(debug) && typeof(options.debug) == TYPE_BOOL):
+		self.debug = options.debug
+	if(self.debug):
+		print(debug_first_half, "_init():")
+
 
 # Notifications
 func _notification(what):
@@ -40,6 +50,12 @@ func _notification(what):
 
 func get_cells_manager():
 	return cells_manager
+
+
+func set_debug(value:bool) -> void:
+	debug = value
+func get_debug() -> bool:
+	return debug
 
 
 func get_inventory():

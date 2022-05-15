@@ -14,9 +14,21 @@ extends Control
 var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
 		"cells_manager/cells_manager.gd") setget , get_cells_manager
 var debug:bool = false setget set_debug, get_debug
+var debug_first_half:String = "Inventory(ui) -> "
+
+func _init(options = { "debug": false, }) -> void:
+	# Check if it has debug also check if the type is boolean
+	if(options.has(debug) && typeof(options.debug) == TYPE_BOOL):
+		self.debug = options.debug
+	if(self.debug):
+		print(debug_first_half, "_init():")
+
 
 func _ready():
-	var grid_container = $BackgroundColor/TabContainer/Inventory/HSplitContainer/GridContainer
+	if(self.debug):
+		print(debug_first_half, "_ready():")
+	
+	var grid_container = $BackgroundColor/HSplitContainer/GridContainer
 	
 	if(self.debug):
 		print("Grid container: ", grid_container)
@@ -25,11 +37,12 @@ func _ready():
 	# rearranging the cells
 	cells_manager = cells_manager.new({
 		"info": {
-			"debug": true,
+			"debug": self.debug,
 			"length": 0,
 			"node_ref": grid_container
 		},
 	})
+
 
 # Notifications
 func _notification(what):
