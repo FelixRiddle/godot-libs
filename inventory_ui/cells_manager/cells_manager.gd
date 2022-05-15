@@ -24,10 +24,6 @@ var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
 # Constructor
 # info is a dictionary containing values for this object properties
 func _init(options:Dictionary = { "info": { } }):
-	# Connect to other node
-#    var timer = get_node("Timer")
-#    timer.connect("timeout", self, "_on_Timer_timeout")
-	
 	# Connect inventory changed
 	var _connect_result = inventory.connect("inventory_changed", self, \
 			"_on_inventory_inventory_changed")
@@ -40,9 +36,15 @@ func _init(options:Dictionary = { "info": { } }):
 	_connect_result = connect("cells_changed", self,
 			"_on_inventory_manager_cells_changed")
 	
-	# Set info
-	if(options.has("info") && typeof(options["info"]) == TYPE_DICTIONARY):
+	# Set information
+	if(typeof(options) == TYPE_DICTIONARY && options.has("info") && \
+			typeof(options["info"]) == TYPE_DICTIONARY):
+		var temp_dict = options["info"]
 		set_info(options["info"])
+		
+		if(temp_dict.has("debug") && typeof(temp_dict["debug"]) == TYPE_BOOL):
+			self.debug = true
+			print("Cells_manager -> _init:")
 
 
 func _ready(options = {}):
@@ -63,9 +65,10 @@ func set_cells_min_size(value:float) -> void:
 	cells_min_size = value
 	
 	# Change every cell size
+	if(debug):
+		print("Resizing every cell")
 	for cell in cells:
 		if(cell.get("rect_min_size")):
-			print("Changing cell size: ", cell.rect_min_size)
 			cell.rect_min_size = Vector2(
 					self.cells_min_size, self.cells_min_size)
 func get_cells_min_size() -> float:
@@ -95,12 +98,15 @@ func set_info(options:Dictionary) -> void:
 		print("Information given: ", options)
 	
 	# Set length/size
-	if((options.has("length") \
-			&& typeof(options["length"]) == TYPE_INT)):
+	if((options.has("length") && \
+			typeof(options["length"]) == TYPE_INT)):
 		self.length = options["length"]
-	if((options.has("size") \
-			&& typeof(options["size"]) == TYPE_INT)):
+	if((options.has("size") && \
+			typeof(options["size"]) == TYPE_INT)):
 		self.length = options["size"]
+	if((options.has("cells_min_size")) && \
+			(typeof(options["cells_min_size"]) == TYPE_REAL)):
+		self.cells_min_size = options["cells_min_size"]
 	
 	# Set node reference
 	if(options.has("node_ref") && options["node_ref"] is Node):

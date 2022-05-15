@@ -11,7 +11,7 @@ extends Control
 #     [] Left
 #     [] Up
 
-var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
+var cells_manager = preload("res://godot-libs/inventory_ui/" + \
 		"cells_manager/cells_manager.gd") setget , get_cells_manager
 var debug:bool = false setget set_debug, get_debug
 var debug_first_half:String = "Inventory(ui) -> "
