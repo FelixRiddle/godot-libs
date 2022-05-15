@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://godot-libs/inventory_ui/cells_manager/cell/cell.gd" type="Script" id=1]
+[ext_resource path="res://godot-libs/inventory_ui/cells_manager/cell/panel.gd" type="Script" id=2]
 
 [node name="Control" type="Control"]
 anchor_right = 0.292969
@@ -8,10 +9,19 @@ anchor_bottom = 0.5
 rect_min_size = Vector2( 1, 1 )
 script = ExtResource( 1 )
 __meta__ = {
+"_edit_lock_": true,
 "_edit_use_anchors_": true
 }
 
-[node name="ColorRect" type="ColorRect" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color( 0.623529, 0.945098, 0.490196, 1 )
+[node name="Panel" type="Panel" parent="."]
+anchor_left = 0.0333333
+anchor_top = 0.0333333
+anchor_right = 0.966667
+anchor_bottom = 0.966667
+margin_left = -9.53674e-07
+margin_top = -9.53674e-07
+hint_tooltip = "Colors managed through code"
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}

@@ -1,5 +1,4 @@
 extends Control
-class_name CellsManager
 
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
 		"cells_manager/cell/cell.tscn")
