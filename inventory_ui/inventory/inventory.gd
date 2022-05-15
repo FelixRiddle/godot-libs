@@ -28,7 +28,7 @@ func _ready():
 	if(self.debug):
 		print(debug_first_half, "_ready():")
 	
-	var grid_container = $BackgroundColor/HSplitContainer/GridContainer
+	var grid_container = $BackgroundColor/ScrollContainer/GridContainer
 	
 	if(self.debug):
 		print("Grid container: ", grid_container)

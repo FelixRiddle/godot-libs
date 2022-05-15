@@ -44,10 +44,13 @@ func _init(options:Dictionary = { "info": { } }):
 		
 		if(temp_dict.has("debug") && typeof(temp_dict["debug"]) == TYPE_BOOL):
 			self.debug = true
-			print("Cells_manager -> _init:")
+			print("CellsManager -> _init:")
 
 
-func _ready(options = {}):
+func _ready():
+	if(self.debug):
+		print("CellsManager -> _ready:")
+	
 	self.cells_min_size = get_viewport().size.x * 0.5
 
 
@@ -147,6 +150,7 @@ func set_length(value:int) -> void:
 			# Add cells to the scene tree
 			for cell in self.cells:
 				cell.updated = true
+				cell.rect_min_size = Vector2(cells_min_size, cells_min_size)
 				node_ref.add_child(cell)
 			
 			emit_signal("cells_changed", old_cells, self.cells)
@@ -181,6 +185,9 @@ func get_overflow() -> Array:
 ### Signals
 func _on_inventory_manager_cells_changed(old_arr:Array = [], \
 			new_arr:Array = []) -> void:
+	if(debug):
+		print("CellsManager -> _on_inventory_manager_cells_changed:")
+	
 	# Remove old slots from the array
 	
 	# Add new cells to the array
@@ -191,9 +198,14 @@ func _on_inventory_manager_cells_changed(old_arr:Array = [], \
 # When there are items added or removed from inventory
 func _on_inventory_inventory_changed(old_inv:Dictionary = {},
 			new_inv_ref:Dictionary = {}) -> void:
+	if(debug):
+		print("CellsManager -> _on_inventory_inventory_changed:")
 	
 	pass
 
 # When the inventory length/size changes
 func _on_inventory_size_changed(old_size:int, new_size:int) -> void:
+	if(debug):
+		print("CellsManager -> _on_inventory_size_changed:")
+	
 	set_length(new_size)
