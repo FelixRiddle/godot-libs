@@ -22,18 +22,15 @@ export(int) var size:int = 10 setget set_size, get_size
 
 # Constructor
 func _init(_options = {}):
-	if(_options.has("debug")):
+	if(_options.has("debug") && typeof(_options["debug"]) == TYPE_BOOL):
 		self.debug = _options.debug
-	
-	if(debug):
-		print("Constructor")
+		print("Inventory(class) -> _init:")
 	
 	# If it's already connected, it would throw an error if we try to connect
 	# it again
 	if(!is_connected("item_added", self, "on_Inventory_item_added")):
 		var connected = connect("item_added", self, \
 			"on_Inventory_item_added")
-		print("Connect return:\n", connected)
 
 ### Functions/Methods ###
 ### Debug

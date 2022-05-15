@@ -1,3 +1,4 @@
+extends Control
 class_name CellsManager
 
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
@@ -14,9 +15,11 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 0 setget set_length, get_length
 
 var cells:Array = [] setget set_cells, get_cells
-var inventory = InventoryScript.new() setget set_inventory, get_inventory
+var inventory = InventoryScript.new({"debug": self.debug}) \
+		setget set_inventory, get_inventory
 var node_ref setget set_node_ref, get_node_ref
 var overflow:Array setget set_overflow, get_overflow
+var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
 
 # Constructor
 # info is a dictionary containing values for this object properties
@@ -26,19 +29,24 @@ func _init(options:Dictionary = { "info": { } }):
 #    timer.connect("timeout", self, "_on_Timer_timeout")
 	
 	# Connect inventory changed
-	inventory.connect("inventory_changed", self, \
+	var _connect_result = inventory.connect("inventory_changed", self, \
 			"_on_inventory_inventory_changed")
 	
 	# Connect size changed
-	inventory.connect("size_changed", self, "_on_inventory_size_changed")
+	_connect_result = inventory.connect("size_changed", self,
+			"_on_inventory_size_changed")
 	
 	# Connect to the cells changed for instancing and destroying cells
-	var _connect_result = connect(
-			"cells_changed", self, "_on_inventory_manager_cells_changed")
+	_connect_result = connect("cells_changed", self,
+			"_on_inventory_manager_cells_changed")
 	
 	# Set info
 	if(options.has("info") && typeof(options["info"]) == TYPE_DICTIONARY):
 		set_info(options["info"])
+
+
+func _ready(options = {}):
+	self.cells_min_size = get_viewport().size.x * 0.5
 
 
 # setget cells
@@ -48,9 +56,29 @@ func get_cells() -> Array:
 	return cells
 
 
+# setget min_size
+func set_cells_min_size(value:float) -> void:
+	if(debug):
+		print("CellsManager -> set_cells_min_size:")
+	cells_min_size = value
+	
+	# Change every cell size
+	for cell in cells:
+		if(cell.get("rect_min_size")):
+			print("Changing cell size: ", cell.rect_min_size)
+			cell.rect_min_size = Vector2(
+					self.cells_min_size, self.cells_min_size)
+func get_cells_min_size() -> float:
+	return cells_min_size
+
+
 # setget debug
 func set_debug(value:bool) -> void:
 	debug = value
+	
+	# Also set debug for the inventory class
+	if(inventory.get("debug")):
+		inventory.debug = self.debug
 func get_debug() -> bool:
 	return debug
 
@@ -63,7 +91,7 @@ func set_info(options:Dictionary) -> void:
 		inventory.debug = options["debug"]
 	
 	if(debug):
-		print("InventoryManager -> set_info:")
+		print("CellsManager -> set_info:")
 		print("Information given: ", options)
 	
 	# Set length/size
@@ -90,7 +118,7 @@ func get_inventory() -> Inventory:
 # the overflow variable
 func set_length(value:int) -> void:
 	if(debug):
-		print("InventoryManager -> set_length:")
+		print("CellsManager -> set_length:")
 	
 	# For later use, set updated to false
 	for cell in self.cells:
@@ -105,9 +133,6 @@ func set_length(value:int) -> void:
 	var result:Dictionary = ArrayUtils.smart_change_length(
 			cells, value, Cell, { "debug": self.debug, })
 	
-	if(debug):
-		print("Result: ", result)
-	
 	if(result.has("new_array")):
 		var old_cells = self.cells.duplicate(true)
 		self.cells = result["new_array"]
@@ -118,12 +143,11 @@ func set_length(value:int) -> void:
 				cell.updated = true
 				node_ref.add_child(cell)
 			
+			emit_signal("cells_changed", old_cells, self.cells)
 			if(debug):
 				print("Added cells to the scene!")
 		elif(debug):
 			print("Reference doesn't exist!")
-		
-		emit_signal("cells_changed", old_cells, self.cells)
 	
 	# Remove previous overflow cells from the scene tree
 	for i in range(self.overflow.duplicate().size()):

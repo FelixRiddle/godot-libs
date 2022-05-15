@@ -17,8 +17,10 @@ signal updated
 var updated:bool = false setget set_updated, get_updated
 
 func _ready():
-	var five_percent_viewport = get_viewport().size.x * .05
-	rect_min_size = Vector2(five_percent_viewport, five_percent_viewport)
+	if(rect_min_size.x <= 0.01 || rect_min_size.y <= 0.01):
+		var five_percent_viewport = get_viewport().size.x * .05
+		rect_min_size = Vector2(five_percent_viewport, five_percent_viewport)
+
 
 # Notifications
 func _notification(what):

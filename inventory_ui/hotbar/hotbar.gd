@@ -6,7 +6,7 @@ extends Control
 #   [] Lock/Unlock item
 #   [] Drop item
 
-var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
+var cells_manager = preload("res://godot-libs/inventory_ui/" + \
 		"cells_manager/cells_manager.gd").new({
 				"debug": true,
 				"length": 0,

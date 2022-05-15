@@ -17,6 +17,9 @@ func _init():
 # Add inventory scene
 # Returns a reference to it
 func add_inventory_scene(scene:PackedScene):
+	if(self.debug):
+		print("InventoryManager -> add_inventory_scene:")
+	
 	var new_scene = scene.instance()
 	
 	if(new_scene.get("debug")):
@@ -26,9 +29,11 @@ func add_inventory_scene(scene:PackedScene):
 	
 	emit_signal("inventory_added", new_scene)
 	
-	# On success return true
+	# On success return the scene
 	return new_scene
 func add_interface(node):
+	if(self.debug):
+		print("InventoryManager -> add_interface:")
 	return add_inventory_scene(node)
 
 
