@@ -2,12 +2,16 @@
 
 [ext_resource path="res://godot-libs/inventory_ui/cells_manager/cell/cell.gd" type="Script" id=1]
 
-[node name="Cell" type="ColorRect"]
-anchor_right = 0.0390625
-anchor_bottom = 0.0666667
-margin_bottom = -3.8147e-06
-color = Color( 0.454902, 0.858824, 0.270588, 1 )
+[node name="Control" type="Control"]
+anchor_right = 0.0683594
+anchor_bottom = 0.116667
+rect_min_size = Vector2( 70, 70 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": true
 }
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.623529, 0.945098, 0.490196, 1 )

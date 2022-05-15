@@ -39,7 +39,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 split_offset = 428
 
-[node name="Panel" type="Panel" parent="BackgroundColor/TabContainer/Inventory/HSplitContainer"]
+[node name="GridContainer" type="GridContainer" parent="BackgroundColor/TabContainer/Inventory/HSplitContainer"]
 margin_right = 423.0
 margin_bottom = 231.0
 

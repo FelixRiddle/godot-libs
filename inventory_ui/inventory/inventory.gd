@@ -13,16 +13,23 @@ extends Control
 
 var cells_manager = preload( "res://godot-libs/inventory_ui/" + \
 		"cells_manager/cells_manager.gd") setget , get_cells_manager
+var debug:bool = false setget set_debug, get_debug
 
 func _ready():
+	var grid_container = $BackgroundColor/TabContainer/Inventory/HSplitContainer/GridContainer
+	
+	if(self.debug):
+		print("Grid container: ", grid_container)
+	
+	# The cells manager will be in charge of creating and
+	# rearranging the cells
 	cells_manager = cells_manager.new({
-				"info": {
-					"debug": true,
-					"length": 0,
-					"node_ref": get_node("BackgroundColor/TabContainer/" + \
-							"Inventory/HSplitContainer/Panel"),
-				},
-		})
+		"info": {
+			"debug": true,
+			"length": 0,
+			"node_ref": grid_container
+		},
+	})
 
 # Notifications
 func _notification(what):
@@ -51,6 +58,12 @@ func _notification(what):
 
 func get_cells_manager():
 	return cells_manager
+
+
+func set_debug(value:bool) -> void:
+	debug = value
+func get_debug() -> bool:
+	return debug
 
 
 func get_inventory():

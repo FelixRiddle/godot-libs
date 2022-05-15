@@ -16,6 +16,9 @@ signal updated
 
 var updated:bool = false setget set_updated, get_updated
 
+func _init():
+	rect_min_size = Vector2(50, 50)
+
 # Notifications
 func _notification(what):
 	match what:

@@ -18,6 +18,10 @@ func _init():
 # Returns a reference to it
 func add_inventory_scene(scene:PackedScene):
 	var new_scene = scene.instance()
+	
+	if(new_scene.get("debug")):
+		new_scene.debug = self.debug
+	
 	add_child(new_scene)
 	
 	emit_signal("inventory_added", new_scene)
