@@ -190,8 +190,8 @@ func _on_inventory_manager_cells_changed(old_arr:Array = [], \
 	# Remove old slots from the array
 	
 	# Add new cells to the array
-	if(debug):
-		print("New cells: ", cells)
+#	if(debug):
+#		print("New cells: ", cells)
 
 
 # When there are items added or removed from inventory
