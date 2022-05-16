@@ -11,7 +11,7 @@ export var class_id = 0 setget set_class_id, get_class_id
 export var class_path = "" setget set_class_path, \
 	get_class_path
 export var debug = false setget set_debug, get_debug
-export var scene_path = "" setget set_scene_path, \
+export(String) var scene_path:String = "" setget set_scene_path, \
 	get_scene_path
 
 # Because some values were predefined when extending Node
@@ -21,6 +21,8 @@ export var item_capacity = 1 setget set_capacity, get_capacity
 export var item_description = "Sample text" \
 	setget set_id, get_id
 export var item_id = 0 setget set_id, get_id
+# Path to the item image
+export(String) var item_image:String = "" setget set_item_image, get_item_image
 export var item_name = "" setget set_name, get_name
 # The slot must be a value between 1 and 10 inclusive
 export var item_slot = 0 setget set_slot, get_slot
@@ -34,10 +36,14 @@ var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
 # Add items
-func add(amount):
-	if(typeof(amount) != TYPE_INT):
-		return false
-	
+# IDK what this is, but it's very wrong.
+# TODO: Fix this sh*t
+func add(amount:int) -> bool:
+#	if(self.item_capacity >= amount):
+#		return false
+#	elif(self.item_capacity < amount):
+#		# Add up to the item_capacity
+#		return false
 	item_amount += amount
 	return true
 
@@ -127,34 +133,52 @@ func get_as_dict():
 
 
 # Get item stats as dictionary
-func _get_item_stats_as_dict():
+func _get_item_stats_as_dict() -> Dictionary:
 	
-	var result = {}
+	var result:Dictionary = {}
 	
-	if(get("class_id")):
-		result["class_id"] = self.class_id
-	if(get("class_path")):
-		result["class_path"] = self.class_path
-	if(get("item_amount")):
-		result["amount"] = self.item_amount
-	if(get("item_capacity")):
-		result["capacity"] = self.item_capacity
-	if(get("item_description")):
-		result["description"] = self.item_description
-	if(get("item_id")):
-		result["item_id"] = self.item_id
-	if(get("item_name")):
-		result["name"] = self.item_name
-	if(get("item_slot")):
-		result["slot"] = self.item_slot
-	if(get("item_subtype")):
-		result["subtype"] = self.item_subtype
-	if(get("item_type")):
-		result["type"] = self.item_type
-	if(get("scene_path")):
-		result["scene"] = self.scene_path
+	# TODO: This could be really improved by using a for loop
+	#if(get("class_id")):
+	result["class_id"] = self.class_id
+	#if(get("class_path")):
+	result["class_path"] = self.class_path
+	#if(get("item_amount")):
+	result["amount"] = self.item_amount
+	#if(get("item_capacity")):
+	result["capacity"] = self.item_capacity
+	#if(get("item_description")):
+	result["description"] = self.item_description
+	#if(get("item_id")):
+	result["item_id"] = self.item_id
+	#if(get("item_name")):
+	result["name"] = self.item_name
+	#if(get("item_slot")):
+	result["slot"] = self.item_slot
+	#if(get("item_subtype")):
+	result["subtype"] = self.item_subtype
+	#if(get("item_type")):
+	result["type"] = self.item_type
+	#if(get("scene_path")):
+	result["scene"] = self.scene_path
 	
 	return result
+
+
+# Get item stats as a dictionary v2
+func get_item_stats_as_dictv2() -> Dictionary:
+	var dict:Dictionary = {}
+	
+	# This class item properties
+	var item_props:Array = ["class_id", "class_path", "item_amount",
+		"item_capacity", "item_description", "item_id", "item_name",
+		"item_slot", "item_subtype", "item_type", "overflow", "scene_path"]
+	
+	# Insert properties into a dictionary
+	for prop_name in item_props:
+		if(get(prop_name)):
+			dict[prop_name] = self[prop_name]
+	
+	return dict
 
 
 # Find item
@@ -166,46 +190,45 @@ static func find(item):
 
 
 # Set info shorthand
-# item_dict:
-func set_info(item_dict):
-	if(item_dict):
-		if(item_dict.get("debug")):
-			self.debug = item_dict["debug"]
-		if(debug):
-			print("Item.gd -> set_info(item):")
-		
-		if(item_dict.get("amount")):
-			self.item_amount = item_dict["amount"]
-		if(item_dict.get("capacity")):
-			self.item_capacity = item_dict["capacity"]
-		if(item_dict.get("class_id")):
-			self.class_id = item_dict["class_id"]
-		if(item_dict.get("class_path")):
-			self.class_path = item_dict["class_path"]
-		if(item_dict.get("description")):
-			self.item_description = item_dict["description"]
-		if(item_dict.get("name")):
-			self.item_name = item_dict["name"]
-		if(item_dict.get("scene_path")):
-			self.scene_path = item_dict["scene_path"]
-		if(item_dict.get("slot")):
-			self.item_slot = item_dict["slot"]
-		if(item_dict.get("subtype")):
-			self.item_subtype = item_dict["subtype"]
-		if(item_dict.get("type")):
-			self.item_type = item_dict["type"]
-		
-		# If the value provided is null, default to create a uuid
-		if(item_dict.get("item_id")):
-			self.item_id = item_dict["item_id"]
-		else:
-			if(debug):
-				print("Setting id to uuid")
-			self.item_id = uuid_util.v4()
-		
-		return item_dict
+# Returns the same dictionary
+func set_info(item_dict:Dictionary) -> Dictionary:
+	if(item_dict.get("debug")):
+		self.debug = item_dict["debug"]
+	if(debug):
+		print("Item.gd -> set_info(item):")
 	
-	return null
+	
+	# TODO: This could be really improved by using a for loop
+	if(item_dict.get("amount")):
+		self.item_amount = item_dict["amount"]
+	if(item_dict.get("capacity")):
+		self.item_capacity = item_dict["capacity"]
+	if(item_dict.get("class_id")):
+		self.class_id = item_dict["class_id"]
+	if(item_dict.get("class_path")):
+		self.class_path = item_dict["class_path"]
+	if(item_dict.get("description")):
+		self.item_description = item_dict["description"]
+	if(item_dict.get("name")):
+		self.item_name = item_dict["name"]
+	if(item_dict.get("scene_path")):
+		self.scene_path = item_dict["scene_path"]
+	if(item_dict.get("slot")):
+		self.item_slot = item_dict["slot"]
+	if(item_dict.get("subtype")):
+		self.item_subtype = item_dict["subtype"]
+	if(item_dict.get("type")):
+		self.item_type = item_dict["type"]
+		
+	# If the value provided is null, default to create a uuid
+	if(item_dict.get("item_id")):
+		self.item_id = item_dict["item_id"]
+	else:
+		if(debug):
+			print("Setting id to uuid")
+		self.item_id = uuid_util.v4()
+	
+	return item_dict
 
 
 ### Amount
@@ -292,6 +315,13 @@ func set_id(value):
 	item_id = value
 func get_id():
 	return item_id
+
+
+# setget item_image
+func set_item_image(value:String) -> void:
+	item_image = value
+func get_item_image() -> String:
+	return item_image
 
 
 ### Item name

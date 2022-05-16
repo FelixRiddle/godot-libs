@@ -16,7 +16,7 @@ static func get_items():
 			"description": "What description can a Wooden Sword have?",
 			"item_id": 1,
 			"name": "Wooden Sword",
-			"scene_path": "",
+			"scene_path": "res://scenes/items/weapons/swords/wooden_sword.tscn",
 			"subtype": "sword",
 			"type": "weapon",
 		},

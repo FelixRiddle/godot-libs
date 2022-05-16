@@ -45,7 +45,7 @@ margin_left = 10.0
 margin_top = 10.0
 margin_right = -10.0
 margin_bottom = -10.0
-stretch_mode = 4
+stretch_mode = 1
 __meta__ = {
 "_edit_lock_": true,
 "_edit_use_anchors_": true
