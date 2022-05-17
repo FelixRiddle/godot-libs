@@ -6,6 +6,8 @@ signal inventory_added(added_inv)
 # The length will likely be overrided
 export(bool) var debug:bool = false setget set_debug, get_debug
 
+var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
+
 func _init():
 	if(debug):
 		print("InventoryManager -> _init:")
@@ -17,11 +19,13 @@ func _init():
 
 # Add inventory scene
 # Returns a reference to it
-func add_inventory_scene(scene:PackedScene):
+func add_inventory_scene(scene:PackedScene, options={}):
 	if(self.debug):
 		print("InventoryManager -> add_inventory_scene:")
 	
 	var new_scene = scene.instance()
+	if(new_scene.has_method("set_info")):
+		new_scene.set_info(options)
 	
 	if(new_scene.get("debug")):
 		new_scene.debug = self.debug
@@ -45,9 +49,11 @@ func get_debug() -> bool:
 	return debug
 
 
-func set_info(options:Dictionary) -> void:
+func set_info(options:Dictionary):
 	if(options.has("debug") \
 			&& typeof(options["debug"]) == TYPE_BOOL):
 		self.debug = options["debug"]
 	if(debug):
 		print("InventoryManager -> set_info:")
+	
+	return ObjectUtils.set_info(self, options)

@@ -1,4 +1,5 @@
 extends Control
+class_name InventoryUI
 
 # Objectives:
 # [] Do an ui that works with the inventory class
@@ -15,6 +16,7 @@ var cells_manager = preload("res://godot-libs/inventory_ui/" + \
 		"cells_manager/cells_manager.gd") setget , get_cells_manager
 var debug:bool = false setget set_debug, get_debug
 var debug_first_half:String = "Inventory(ui) -> "
+var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
 func _init(options = { "debug": false, }) -> void:
 	# Check if it has debug also check if the type is boolean
@@ -77,6 +79,14 @@ func set_debug(value:bool) -> void:
 	debug = value
 func get_debug() -> bool:
 	return debug
+
+
+# set info
+func set_info(options={}):
+	if(self.debug):
+		print(debug_first_half, "set_info():")
+	
+	return ObjectUtils.set_info(self, options)
 
 
 func get_inventory():
