@@ -1,4 +1,5 @@
 extends CanvasLayer
+class_name InventoryManager
 
 signal inventory_added(added_inv)
 
