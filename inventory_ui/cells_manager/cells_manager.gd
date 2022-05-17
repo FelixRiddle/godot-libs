@@ -1,4 +1,5 @@
 extends Control
+class_name CellsManager
 
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
 		"cells_manager/cell/cell.tscn")
@@ -51,6 +52,30 @@ func _ready():
 		print("CellsManager -> _ready:")
 	
 	self.cells_min_size = get_viewport().size.x * 0.5
+
+
+# Set cell textures
+func set_cells_textures(textures:Dictionary) -> bool:
+	if(debug):
+		print("CellsManager -> set_cells_textures():")
+	
+	var props_name:Array = ["texture_normal", "texture_disabled",
+			"texture_focused", "texture_hover", "texture_pressed"]
+	
+	for cell in self.cells:
+		if(cell.get("texture_button")):
+			var texture_button = cell.texture_button
+			
+			for prop in props_name:
+				if(texture_button.get(prop) && textures.has(prop) && \
+						textures[prop] is StreamTexture):
+					texture_button[prop] = textures[prop]
+	
+	return true
+func change_cells_textures(textures:Dictionary) -> bool:
+	return set_cells_textures(textures)
+func change_cells_sprites(textures:Dictionary) -> bool:
+	return set_cells_textures(textures)
 
 
 # setget cells

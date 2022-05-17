@@ -14,6 +14,8 @@ extends Control
 
 signal updated
 
+onready var texture_button:TextureButton = $TextureButton
+
 var updated:bool = false setget set_updated, get_updated
 
 func _ready():

@@ -12,12 +12,11 @@ signal life_changed(old_value, new_value)
 signal life_depleted
 
 # Properties
-export var damage = 1 setget set_damage, get_damage
-export var entity_name = "Entity" setget set_entity_name, get_entity_name
+export(float) var damage:float = 1.00 setget set_damage, get_damage
+export(String) var entity_name:String = "Entity" setget \
+		set_entity_name, get_entity_name
 # TODO: This should be double/float type
-export var life = 100 setget set_life, get_life
-# TODO: Create an inventory class
-#export var inventory
+export(float) var life:float = 100 setget set_life, get_life
 
 # Called when the node enters the scene tree for the first time.
 #func _ready():
