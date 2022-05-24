@@ -23,9 +23,9 @@ func _auto_detect_areas(obj_ref, options:Dictionary) -> bool:
 	
 	if(options.has("area_name") && \
 			typeof(options["area_name"]) == TYPE_STRING):
-		obj_ref.find_node(options["area_name"])
+		opacity_area = obj_ref.find_node(options["area_name"])
 	else:
-		obj_ref.find_node("OpacityArea")
+		opacity_area = obj_ref.find_node("OpacityArea")
 	
 	if(opacity_area is Area2D):
 		opacity_area.connect("body_entered", self,
