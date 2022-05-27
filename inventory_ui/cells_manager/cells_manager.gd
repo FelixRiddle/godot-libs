@@ -15,11 +15,12 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 0 setget set_length, get_length
 
 var cells:Array = [] setget set_cells, get_cells
-var inventory = InventoryScript.new({"debug": self.debug}) \
+var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
 		setget set_inventory, get_inventory
 var node_ref setget set_node_ref, get_node_ref
 var overflow:Array setget set_overflow, get_overflow
-var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
+# Cells size in pixels
+var cells_min_size:float = 45 setget set_cells_min_size, get_cells_min_size
 
 # Constructor
 # info is a dictionary containing values for this object properties
@@ -42,7 +43,9 @@ func _init(options:Dictionary = { "info": { } }):
 		var temp_dict = options["info"]
 		set_info(options["info"])
 		
-		if(temp_dict.has("debug") && typeof(temp_dict["debug"]) == TYPE_BOOL):
+		if(temp_dict.has("debug") && \
+				typeof(temp_dict["debug"]) == TYPE_BOOL &&
+				temp_dict["debug"]):
 			self.debug = true
 			print("CellsManager -> _init:")
 

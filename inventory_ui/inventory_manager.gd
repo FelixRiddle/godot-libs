@@ -19,27 +19,25 @@ func _init():
 
 # Add inventory scene
 # Returns a reference to it
-func add_inventory_scene(scene:PackedScene, options={}):
+func add_inventory_scene(scene:PackedScene, options={ "properties": { } }):
 	if(self.debug):
 		print("InventoryManager -> add_inventory_scene:")
 	
 	var new_scene = scene.instance()
-	if(new_scene.has_method("set_info")):
-		new_scene.set_info(options)
+	ObjectUtils.set_info(new_scene, options["properties"])
 	
 	if(new_scene.get("debug")):
 		new_scene.debug = self.debug
 	
 	add_child(new_scene)
-	
 	emit_signal("inventory_added", new_scene)
 	
 	# On success return the scene
 	return new_scene
-func add_interface(node):
+func add_interface(scene:PackedScene, options={ "properties": { } }):
 	if(self.debug):
 		print("InventoryManager -> add_interface:")
-	return add_inventory_scene(node)
+	return add_inventory_scene(scene, options)
 
 
 # setget debug

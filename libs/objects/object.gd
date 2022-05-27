@@ -9,6 +9,8 @@ func _init(obj_ref=null, options={ "opacity_manager": true, }):
 	self.obj = obj_ref
 	
 	if(options.has("opacity_manager") && options["opacity_manager"]):
+		# Note that opacity manager, by default, it assumes the Area2D
+		# node name is OpacityArea
 		opacity_manager.enable(obj_ref)
 
 

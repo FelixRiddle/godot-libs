@@ -22,7 +22,8 @@ export(int) var size:int = 10 setget set_size, get_size
 
 # Constructor
 func _init(_options = {}):
-	if(_options.has("debug") && typeof(_options["debug"]) == TYPE_BOOL):
+	if(_options.has("debug") && typeof(_options["debug"]) == TYPE_BOOL && \
+			_options["debug"]):
 		self.debug = _options.debug
 		print("Inventory(class) -> _init:")
 	
