@@ -4,6 +4,7 @@ class_name CellsManager
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
 		"cells_manager/cell/cell.tscn")
 var InventoryScript = preload("res://godot-libs/inventory/inventory.gd")
+var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
 signal cells_changed(old_arr, new_arr)
 # Every time overflow changes free the previous ones?
@@ -17,14 +18,19 @@ export(int) var length:int = 0 setget set_length, get_length
 var cells:Array = [] setget set_cells, get_cells
 var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
 		setget set_inventory, get_inventory
-var node_ref setget set_node_ref, get_node_ref
+var node_ref = Node.new() setget set_node_ref, get_node_ref
 var overflow:Array setget set_overflow, get_overflow
 # Cells size in pixels
-var cells_min_size:float = 45 setget set_cells_min_size, get_cells_min_size
+var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
+var reliable_viewport = Vector2(
+		ProjectSettings.get_setting("display/window/size/width"), \
+		ProjectSettings.get_setting("display/window/size/height"))
 
 # Constructor
 # info is a dictionary containing values for this object properties
 func _init(options:Dictionary = { "info": { } }):
+	self.cells_min_size = get_default_rect_size()
+	
 	# Connect inventory changed
 	var _connect_result = inventory.connect("inventory_changed", self, \
 			"_on_inventory_inventory_changed")
@@ -40,21 +46,14 @@ func _init(options:Dictionary = { "info": { } }):
 	# Set information
 	if(typeof(options) == TYPE_DICTIONARY && options.has("info") && \
 			typeof(options["info"]) == TYPE_DICTIONARY):
-		var temp_dict = options["info"]
-		set_info(options["info"])
+		var options_info = options["info"]
+		ObjectUtils.set_info(self, options_info)
 		
-		if(temp_dict.has("debug") && \
-				typeof(temp_dict["debug"]) == TYPE_BOOL &&
-				temp_dict["debug"]):
-			self.debug = true
-			print("CellsManager -> _init:")
-
-
-func _ready():
-	if(self.debug):
-		print("CellsManager -> _ready:")
-	
-	self.cells_min_size = get_viewport().size.x * 0.5
+		if(self.debug):
+			print("CellsManager -> _init(options):")
+			print("Node set: ", node_ref)
+	else:
+		print("It won't work without a reference!")
 
 
 # Set cell textures
@@ -92,17 +91,27 @@ func get_cells() -> Array:
 func set_cells_min_size(value:float) -> void:
 	if(debug):
 		print("CellsManager -> set_cells_min_size:")
+	print("---- Set cells min size: ", value)
 	cells_min_size = value
 	
 	# Change every cell size
 	if(debug):
 		print("Resizing every cell")
 	for cell in cells:
-		if(cell.get("rect_min_size")):
+		if(cell.get("rect_min_size") && value > 1):
 			cell.rect_min_size = Vector2(
 					self.cells_min_size, self.cells_min_size)
 func get_cells_min_size() -> float:
 	return cells_min_size
+
+
+# Had a serious bug that I couldn't fix for hours so here is the list of
+# functions I used to try to fix it
+# Even though this object is created in a _ready() function
+# get_viewport() returns null, that's the main problem
+func get_default_rect_size():
+	var new_size = reliable_viewport.x * 0.05
+	return new_size
 
 
 # setget debug
@@ -114,33 +123,6 @@ func set_debug(value:bool) -> void:
 		inventory.debug = self.debug
 func get_debug() -> bool:
 	return debug
-
-
-# Shorthand to set data
-func set_info(options:Dictionary) -> void:
-	if(options.has("debug") \
-			&& typeof(options["debug"]) == TYPE_BOOL):
-		self.debug = options["debug"]
-		inventory.debug = options["debug"]
-	
-	if(debug):
-		print("CellsManager -> set_info:")
-		print("Information given: ", options)
-	
-	# Set length/size
-	if((options.has("length") && \
-			typeof(options["length"]) == TYPE_INT)):
-		self.length = options["length"]
-	if((options.has("size") && \
-			typeof(options["size"]) == TYPE_INT)):
-		self.length = options["size"]
-	if((options.has("cells_min_size")) && \
-			(typeof(options["cells_min_size"]) == TYPE_REAL)):
-		self.cells_min_size = options["cells_min_size"]
-	
-	# Set node reference
-	if(options.has("node_ref") && options["node_ref"] is Node):
-		self.node_ref = options["node_ref"]
 
 
 func set_inventory(value:Inventory) -> void:
@@ -176,15 +158,19 @@ func set_length(value:int) -> void:
 		if(node_ref):
 			# Add cells to the scene tree
 			for cell in self.cells:
-				cell.updated = true
-				cell.rect_min_size = Vector2(cells_min_size, cells_min_size)
+				ObjectUtils.set_info(cell, {
+					"updated": true,
+					"rect_min_size": Vector2(self.cells_min_size,
+							self.cells_min_size),
+				})
+					
 				node_ref.add_child(cell)
 			
 			emit_signal("cells_changed", old_cells, self.cells)
 			if(debug):
 				print("Added cells to the scene!")
 		elif(debug):
-			print("Reference doesn't exist!")
+			print("Reference doesn't exist!: ", node_ref)
 	
 	# Remove previous overflow cells from the scene tree
 	for i in range(self.overflow.duplicate().size()):
@@ -198,7 +184,11 @@ func get_length() -> int:
 
 
 func set_node_ref(value) -> void:
-	node_ref = value
+	if(self.debug):
+		print("CellsManager -> set_node_ref(value):")
+		print("New node ref: ", value)
+	if(value is Node):
+		node_ref = value
 func get_node_ref():
 	return node_ref
 

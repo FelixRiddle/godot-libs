@@ -22,7 +22,7 @@ export var item_description = "Sample text" \
 	setget set_id, get_id
 export var item_id = 0 setget set_id, get_id
 # Path to the item image
-export(String) var item_image:String = "" setget set_item_image, get_item_image
+export var item_image = "" setget set_item_image, get_item_image
 export var item_name = "" setget set_name, get_name
 # The slot must be a value between 1 and 10 inclusive
 export var item_slot = 0 setget set_slot, get_slot
@@ -318,9 +318,15 @@ func get_id():
 
 
 # setget item_image
-func set_item_image(value:String) -> void:
-	item_image = value
-func get_item_image() -> String:
+func set_item_image(value) -> void:
+	var new_image = value
+	
+	# If it's a path, load the resource
+	if(typeof(value) == TYPE_STRING):
+		new_image = load(value)
+	
+	item_image = new_image
+func get_item_image():
 	return item_image
 
 

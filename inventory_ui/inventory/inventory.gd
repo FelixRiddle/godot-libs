@@ -36,13 +36,16 @@ func _ready():
 	
 	# The cells manager will be in charge of creating and
 	# rearranging the cells
-	cells_manager = cells_manager.new({
-		"info": {
+	var info:Dictionary = {
 			"debug": self.debug,
 			"length": 0,
-			"node_ref": grid_container
-		},
+			"node_ref": grid_container,
+			"viewport": get_viewport(),
+		}
+	cells_manager = cells_manager.new({
+		"info": info,
 	})
+	print("Info: ", info)
 
 
 # Notifications

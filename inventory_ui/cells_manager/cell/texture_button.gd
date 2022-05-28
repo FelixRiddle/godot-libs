@@ -1,10 +1,21 @@
 extends TextureButton
 
-func _init():
-	pass
+# Objectives:
+# [] Do an ui that works with the inventory class
+# [] Second click on an item shows some options
+#   [] Lock/Unlock item
+#   [] See details
+#   [] Drop item
+#   [] Move
+#     [] Right
+#     [] Down
+#     [] Left
+#     [] Up
+
 
 # Notifications
 func _notification(what):
+	# TODO: Cell actions when the cursor moves around the cells
 	match what:
 		NOTIFICATION_MOUSE_ENTER: # Mouse entered the area of this control.
 			# Show item description
