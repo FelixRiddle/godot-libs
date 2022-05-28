@@ -16,6 +16,7 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 0 setget set_length, get_length
 
 var cells:Array = [] setget set_cells, get_cells
+var grid_ref setget set_grid_ref, get_grid_ref
 var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
 		setget set_inventory, get_inventory
 var node_ref = Node.new() setget set_node_ref, get_node_ref
@@ -54,6 +55,25 @@ func _init(options:Dictionary = { "info": { } }):
 			print("Node set: ", node_ref)
 	else:
 		print("It won't work without a reference!")
+
+
+# It first tries to add the cells to grid_ref, if not possible
+# it adds the cells on the node_ref
+func _add_cells(cells, old_cells):
+	# Add cells to the scene tree
+	for cell in cells:
+		ObjectUtils.set_info(cell, {
+			"updated": true,
+			"rect_min_size": Vector2(self.cells_min_size,
+					self.cells_min_size),
+		})
+		
+		if(grid_ref != null && grid_ref is Control):
+			grid_ref.add_child(cell)
+		elif(node_ref != null && node_ref is Control):
+			node_ref.add_child(cell)
+	
+	emit_signal("cells_changed", old_cells, cells)
 
 
 # Set cell textures
@@ -125,6 +145,12 @@ func get_debug() -> bool:
 	return debug
 
 
+func set_grid_ref(value) -> void:
+	grid_ref = value
+func get_grid_ref():
+	return grid_ref
+
+
 func set_inventory(value:Inventory) -> void:
 	inventory = value
 func get_inventory() -> Inventory:
@@ -151,22 +177,13 @@ func set_length(value:int) -> void:
 	var result:Dictionary = ArrayUtils.smart_change_length(
 			cells, value, Cell, { "debug": self.debug, })
 	
+	# This new array, only has the remaining cells
 	if(result.has("new_array")):
 		var old_cells = self.cells.duplicate(true)
 		self.cells = result["new_array"]
 		
 		if(node_ref):
-			# Add cells to the scene tree
-			for cell in self.cells:
-				ObjectUtils.set_info(cell, {
-					"updated": true,
-					"rect_min_size": Vector2(self.cells_min_size,
-							self.cells_min_size),
-				})
-					
-				node_ref.add_child(cell)
-			
-			emit_signal("cells_changed", old_cells, self.cells)
+			_add_cells(self.cells, old_cells)
 			if(debug):
 				print("Added cells to the scene!")
 		elif(debug):
@@ -176,6 +193,7 @@ func set_length(value:int) -> void:
 	for i in range(self.overflow.duplicate().size()):
 		self.overflow[i].queue_free()
 	
+	# Set the new overflow
 	if(result.has("deleted_items")):
 		self.overflow = result["deleted_items"]
 		emit_signal("overflow_changed", self.overflow)
@@ -208,9 +226,6 @@ func _on_inventory_manager_cells_changed(old_arr:Array = [], \
 	# Remove old slots from the array
 	
 	# Add new cells to the array
-#	if(debug):
-#		print("New cells: ", cells)
-
 
 # When there are items added or removed from inventory
 func _on_inventory_inventory_changed(old_inv:Dictionary = {},

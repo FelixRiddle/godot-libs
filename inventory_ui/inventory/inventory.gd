@@ -17,14 +17,6 @@ var cells_manager = preload("res://godot-libs/inventory_ui/" + \
 var debug:bool = false setget set_debug, get_debug
 var debug_first_half:String = "Inventory(ui) -> "
 
-func _init(options = { "debug": false, }) -> void:
-	# Check if it has debug also check if the type is boolean
-	if(options.has(debug) && typeof(options.debug) == TYPE_BOOL):
-		self.debug = options.debug
-	if(self.debug):
-		print(debug_first_half, "_init():")
-
-
 func _ready():
 	if(self.debug):
 		print(debug_first_half, "_ready():")
