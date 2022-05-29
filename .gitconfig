@@ -1,0 +1,14 @@
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+[remote "origin"]
+        url = git@github.com:FelixRiddle/godot-libs.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+        pushurl = git@github.com:FelixRiddle/godot-libs.git
+        pushurl = git@bitbucket.org:fedekiller999/godot-libs.git
+        pushurl = git@gitlab.com:FelixRiddle/godot-libs.git
+[branch "main"]
+        remote = origin
+        merge = refs/heads/main
