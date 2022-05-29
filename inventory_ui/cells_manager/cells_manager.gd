@@ -59,14 +59,14 @@ func _init(options:Dictionary = { "info": { } }):
 
 # It first tries to add the cells to grid_ref, if not possible
 # it adds the cells on the node_ref
-func _add_cells(cells:Array, old_cells:Array) -> void:
+func _add_cells(new_cells:Array, old_cells:Array) -> void:
 	if(self.debug):
 		print("CellsManager -> _add_cells(cells, old_cells):")
 		print("Grid reference: ", grid_ref)
 		print("Node reference: ", node_ref)
 	
 	# Add cells to the scene tree
-	for cell in cells:
+	for cell in new_cells:
 		ObjectUtils.set_info(cell, {
 			"updated": true,
 			"rect_min_size": Vector2(self.cells_min_size,
@@ -78,7 +78,7 @@ func _add_cells(cells:Array, old_cells:Array) -> void:
 		elif(node_ref != null && node_ref is Control):
 			node_ref.add_child(cell)
 	
-	emit_signal("cells_changed", old_cells, cells)
+	emit_signal("cells_changed", old_cells, new_cells)
 
 
 # Set cell textures
@@ -103,6 +103,73 @@ func change_cells_textures(textures:Dictionary) -> bool:
 	return set_cells_textures(textures)
 func change_cells_sprites(textures:Dictionary) -> bool:
 	return set_cells_textures(textures)
+
+
+# Actions for the middle mouse, to be executed inside an infinite function
+# like _physics_process
+func middle_mouse_manager() -> void:
+	#	● BUTTON_WHEEL_UP = 4
+	#	Mouse wheel up.
+	#	● BUTTON_WHEEL_DOWN = 5
+	#	Mouse wheel down.
+	#	● BUTTON_WHEEL_LEFT = 6
+	#	Mouse wheel left button (only present on some mice).
+	#	● BUTTON_WHEEL_RIGHT = 7
+	#	Mouse wheel right button (only present on some mice).
+	var wheel_up = Input.is_mouse_button_pressed(BUTTON_WHEEL_UP) || \
+			Input.is_joy_button_pressed(0, JOY_DPAD_UP)
+	var wheel_down = Input.is_mouse_button_pressed(BUTTON_WHEEL_DOWN) || \
+			Input.is_joy_button_pressed(0, JOY_DPAD_DOWN)
+	
+	# The default behaviour of a grid is to handle arrow keys so if we,
+	# activate the dpad left and right, it will move with a step of 2
+	var wheel_left = Input.is_mouse_button_pressed(BUTTON_WHEEL_LEFT) \
+#			|| Input.is_joy_button_pressed(0, JOY_DPAD_LEFT)
+	var wheel_right = Input.is_mouse_button_pressed(BUTTON_WHEEL_RIGHT) \
+#			|| Input.is_joy_button_pressed(0, JOY_DPAD_RIGHT)
+	var selected_cell = get_selected_cell_index()
+	
+	if(selected_cell == null):
+		return
+	
+	if(wheel_up || wheel_right):
+		# Select a cell one to the right
+		selected_cell += 1
+		if(selected_cell >= cells.size()):
+			selected_cell = 0
+		
+		var new_cell = cells[selected_cell]
+		new_cell.grab_focus()
+		new_cell.get_node("TextureButton").grab_focus()
+	elif(wheel_down || wheel_left):
+		# Select a cell one to the left
+		selected_cell -= 1
+		if(selected_cell < 0):
+			# selected_cell will be the last index
+			selected_cell = cells.size() - 1
+		
+		var new_cell = cells[selected_cell]
+		new_cell.grab_focus()
+		new_cell.get_node("TextureButton").grab_focus()
+
+func get_selected_cell():
+	for cell in cells:
+		# We need the texture button state
+		var tb:TextureButton = cell.get_node("TextureButton")
+		if(tb.has_focus()):
+			if(self.debug):
+				print("Cell ", cell.name, " has focus.")
+			return cell
+	return null
+
+
+func get_selected_cell_index():
+	for i in range(cells.size()):
+		# We need the texture button state
+		var tb:TextureButton = cells[i].get_node("TextureButton")
+		if(tb.has_focus()):
+			return i
+	return null
 
 
 # setget cells

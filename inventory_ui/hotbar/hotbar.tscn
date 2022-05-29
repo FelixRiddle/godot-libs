@@ -15,3 +15,4 @@ color = Color( 0.188235, 0.188235, 0.188235, 0.498039 )
 [node name="GridContainer" type="GridContainer" parent="BackgroundColor"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2

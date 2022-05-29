@@ -27,6 +27,13 @@ func _ready() -> void:
 		print("Info: ", info)
 
 
+#func _physics_process(delta):
+#	cells_manager.middle_mouse_manager()
+
+func _input(event):
+	cells_manager.middle_mouse_manager()
+
+
 # If required, call after setting the size for the cells
 func set_automatic_size():
 	# TODO: Change the cells position based on the space,

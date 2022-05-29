@@ -1,5 +1,7 @@
 class_name InputHandler
 
+var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
+
 var deadzone:float = 0.10 setget set_deadzone, get_deadzone
 var disable_wasd:bool = false setget set_disable_wasd, get_disable_wasd
 var disable_arrows:bool = true setget set_disable_arrows, get_disable_arrows
@@ -8,16 +10,7 @@ var disable_joystick:bool = false setget set_disable_joystick, \
 
 
 func _init(_options = { }) -> void:
-	if(_options.has("disable_wasd")):
-		self.disable_wasd = _options["disable_wasd"]
-	if(_options.has("disable_arrows")):
-		self.disable_arrows = _options["disable_arrows"]
-	if(_options.has("disable_joystick")):
-		self.disable_joystick = _options["disable_joystick"]
-	if(_options.has("disable_joypad")):
-		self.disable_joystick = _options["disable_joypad"]
-	if(_options.has("deadzone")):
-		self.deadzone = _options["deadzone"]
+	ObjectUtils.set_info(self, _options)
 
 
 ### Player movement ###
@@ -37,7 +30,8 @@ func left() -> bool:
 		return true
 	
 	# The minus is very important xD
-	if(Input.get_joy_axis(0, 0) < -self.deadzone && !self.disable_joystick):
+	if(Input.get_joy_axis(0, JOY_AXIS_0) < -self.deadzone && \
+			!self.disable_joystick):
 		return true
 	return false
 
@@ -49,7 +43,8 @@ func right() -> bool:
 	if(Input.is_physical_key_pressed(KEY_RIGHT) && !self.disable_arrows):
 		return true
 	
-	if(Input.get_joy_axis(0, 0) > self.deadzone && !self.disable_joystick):
+	if(Input.get_joy_axis(0, JOY_AXIS_0) > self.deadzone && \
+			!self.disable_joystick):
 		return true
 	return false
 
@@ -62,7 +57,8 @@ func up() -> bool:
 		return true
 	
 	# The minus is very important xD
-	if(Input.get_joy_axis(0, 1) < -self.deadzone && !self.disable_joystick):
+	if(Input.get_joy_axis(0, JOY_AXIS_1) < -self.deadzone && \
+			!self.disable_joystick):
 		return true
 	return false
 
@@ -74,7 +70,8 @@ func down() -> bool:
 	if(Input.is_physical_key_pressed(KEY_DOWN) && !self.disable_arrows):
 		return true
 	
-	if(Input.get_joy_axis(0, 1) > self.deadzone && !self.disable_joystick):
+	if(Input.get_joy_axis(0, JOY_AXIS_1) > self.deadzone && \
+			!self.disable_joystick):
 		return true
 	return false
 
