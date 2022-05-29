@@ -1,4 +1,4 @@
-extends Control
+extends GridContainer
 class_name CellsManager
 
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
@@ -16,7 +16,7 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 0 setget set_length, get_length
 
 var cells:Array = [] setget set_cells, get_cells
-var grid_ref setget set_grid_ref, get_grid_ref
+var grid_ref = GridContainer.new() setget set_grid_ref, get_grid_ref
 var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
 		setget set_inventory, get_inventory
 var node_ref = Node.new() setget set_node_ref, get_node_ref
@@ -59,7 +59,12 @@ func _init(options:Dictionary = { "info": { } }):
 
 # It first tries to add the cells to grid_ref, if not possible
 # it adds the cells on the node_ref
-func _add_cells(cells, old_cells):
+func _add_cells(cells:Array, old_cells:Array) -> void:
+	if(self.debug):
+		print("CellsManager -> _add_cells(cells, old_cells):")
+		print("Grid reference: ", grid_ref)
+		print("Node reference: ", node_ref)
+	
 	# Add cells to the scene tree
 	for cell in cells:
 		ObjectUtils.set_info(cell, {

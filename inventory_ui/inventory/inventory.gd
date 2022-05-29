@@ -30,14 +30,15 @@ func _ready():
 	# rearranging the cells
 	var info:Dictionary = {
 			"debug": self.debug,
+			"grid_ref": grid_container,
 			"length": 0,
 			"node_ref": grid_container,
-			"viewport": get_viewport(),
 		}
 	cells_manager = cells_manager.new({
 		"info": info,
 	})
-	print("Info: ", info)
+	if(self.debug):
+		print("Info: ", info)
 
 
 # Notifications
