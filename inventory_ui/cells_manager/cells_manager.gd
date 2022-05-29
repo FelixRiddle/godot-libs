@@ -1,4 +1,4 @@
-extends GridContainer
+extends Control
 class_name CellsManager
 
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
@@ -16,13 +16,14 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 0 setget set_length, get_length
 
 var cells:Array = [] setget set_cells, get_cells
+var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
 var grid_ref = GridContainer.new() setget set_grid_ref, get_grid_ref
 var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
 		setget set_inventory, get_inventory
 var node_ref = Node.new() setget set_node_ref, get_node_ref
 var overflow:Array setget set_overflow, get_overflow
+var prev_focused:int = 0 setget set_prev_focused, get_prev_focused
 # Cells size in pixels
-var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
 var reliable_viewport = Vector2(
 		ProjectSettings.get_setting("display/window/size/width"), \
 		ProjectSettings.get_setting("display/window/size/height"))
@@ -39,10 +40,6 @@ func _init(options:Dictionary = { "info": { } }):
 	# Connect size changed
 	_connect_result = inventory.connect("size_changed", self,
 			"_on_inventory_size_changed")
-	
-	# Connect to the cells changed for instancing and destroying cells
-	_connect_result = connect("cells_changed", self,
-			"_on_inventory_manager_cells_changed")
 	
 	# Set information
 	if(typeof(options) == TYPE_DICTIONARY && options.has("info") && \
@@ -81,28 +78,25 @@ func _add_cells(new_cells:Array, old_cells:Array) -> void:
 	emit_signal("cells_changed", old_cells, new_cells)
 
 
-# Set cell textures
-func set_cells_textures(textures:Dictionary) -> bool:
-	if(debug):
-		print("CellsManager -> set_cells_textures():")
+func _update_cells(new_cells:Array) -> void:
+	if(self.debug):
+		print("CellsManager -> _update_cells(new_cells):")
+		print("New cells: ", new_cells)
 	
-	var props_name:Array = ["texture_normal", "texture_disabled",
-			"texture_focused", "texture_hover", "texture_pressed"]
+	# This new array, only has the remaining cells
+	var old_cells = self.cells.duplicate(true)
+	self.cells = new_cells
 	
-	for cell in self.cells:
-		if(cell.get("texture_button")):
-			var texture_button = cell.texture_button
-			
-			for prop in props_name:
-				if(texture_button.get(prop) && textures.has(prop) && \
-						textures[prop] is StreamTexture):
-					texture_button[prop] = textures[prop]
-	
-	return true
-func change_cells_textures(textures:Dictionary) -> bool:
-	return set_cells_textures(textures)
-func change_cells_sprites(textures:Dictionary) -> bool:
-	return set_cells_textures(textures)
+	if(node_ref):
+		_add_cells(self.cells, old_cells)
+		
+		# Grab focus
+		restore_focus()
+		
+		if(debug):
+			print("Added cells to the scene!")
+	elif(debug):
+		print("Reference doesn't exist!: ", node_ref)
 
 
 # Actions for the middle mouse, to be executed inside an infinite function
@@ -139,7 +133,6 @@ func middle_mouse_manager() -> void:
 			selected_cell = 0
 		
 		var new_cell = cells[selected_cell]
-		new_cell.grab_focus()
 		new_cell.get_node("TextureButton").grab_focus()
 	elif(wheel_down || wheel_left):
 		# Select a cell one to the left
@@ -149,8 +142,8 @@ func middle_mouse_manager() -> void:
 			selected_cell = cells.size() - 1
 		
 		var new_cell = cells[selected_cell]
-		new_cell.grab_focus()
 		new_cell.get_node("TextureButton").grab_focus()
+
 
 func get_selected_cell():
 	for cell in cells:
@@ -170,6 +163,35 @@ func get_selected_cell_index():
 		if(tb.has_focus()):
 			return i
 	return null
+
+
+# Remove previous overflowed cells from the scene tree
+func remove_overflow() -> void:
+	if(self.debug):
+		print("CellsManager -> remove_overflow():")
+	
+	for i in range(self.overflow.duplicate().size()):
+		self.overflow[i].queue_free()
+
+
+func restore_focus() -> void:
+	if(self.prev_focused < cells.size()):
+		var selected_cell = self.cells[self.prev_focused]
+		
+		if(selected_cell):
+			var texture_btn = selected_cell.get_node("TextureButton")
+			
+			if(texture_btn is TextureButton):
+				texture_btn.grab_focus()
+	elif(self.cells.size() >= 1):
+		var selected_cell = self.cells[0]
+		
+		if(selected_cell):
+			var texture_btn = selected_cell.get_node(
+					"TextureButton")
+			
+			if(texture_btn is TextureButton):
+				texture_btn.grab_focus()
 
 
 # setget cells
@@ -195,6 +217,30 @@ func set_cells_min_size(value:float) -> void:
 					self.cells_min_size, self.cells_min_size)
 func get_cells_min_size() -> float:
 	return cells_min_size
+
+
+# Set cell textures
+func set_cells_textures(textures:Dictionary) -> bool:
+	if(debug):
+		print("CellsManager -> set_cells_textures():")
+	
+	var props_name:Array = ["texture_normal", "texture_disabled",
+			"texture_focused", "texture_hover", "texture_pressed"]
+	
+	for cell in self.cells:
+		if(cell.get("texture_button")):
+			var texture_button = cell.texture_button
+			
+			for prop in props_name:
+				if(texture_button.get(prop) && textures.has(prop) && \
+						textures[prop] is StreamTexture):
+					texture_button[prop] = textures[prop]
+	
+	return true
+func change_cells_textures(textures:Dictionary) -> bool:
+	return set_cells_textures(textures)
+func change_cells_sprites(textures:Dictionary) -> bool:
+	return set_cells_textures(textures)
 
 
 # Get the default rect size, which will be a 5% of the window width
@@ -244,23 +290,18 @@ func set_length(value:int) -> void:
 	if(debug):
 		print("Resizing the array...")
 	var result:Dictionary = ArrayUtils.smart_change_length(
-			cells, value, Cell, { "debug": self.debug, })
+			self.cells,
+			self.length,
+			Cell,
+			{
+				"debug": self.debug,
+			})
 	
-	# This new array, only has the remaining cells
-	if(result.has("new_array")):
-		var old_cells = self.cells.duplicate(true)
-		self.cells = result["new_array"]
-		
-		if(node_ref):
-			_add_cells(self.cells, old_cells)
-			if(debug):
-				print("Added cells to the scene!")
-		elif(debug):
-			print("Reference doesn't exist!: ", node_ref)
+	if("new_array" in result):
+		_update_cells(result["new_array"])
 	
 	# Remove previous overflow cells from the scene tree
-	for i in range(self.overflow.duplicate().size()):
-		self.overflow[i].queue_free()
+	remove_overflow()
 	
 	# Set the new overflow
 	if(result.has("deleted_items")):
@@ -280,6 +321,12 @@ func get_node_ref():
 	return node_ref
 
 
+func set_prev_focused(value:int) -> void:
+	prev_focused = value
+func get_prev_focused() -> int:
+	return prev_focused
+
+
 func set_overflow(value:Array) -> void:
 	overflow = value
 func get_overflow() -> Array:
@@ -287,15 +334,6 @@ func get_overflow() -> Array:
 
 
 ### Signals
-func _on_inventory_manager_cells_changed(old_arr:Array = [], \
-			new_arr:Array = []) -> void:
-	if(debug):
-		print("CellsManager -> _on_inventory_manager_cells_changed:")
-	
-	# Remove old slots from the array
-	
-	# Add new cells to the array
-
 # When there are items added or removed from inventory
 func _on_inventory_inventory_changed(old_inv:Dictionary = {},
 			new_inv_ref:Dictionary = {}) -> void:
