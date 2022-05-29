@@ -99,6 +99,37 @@ func _update_cells(new_cells:Array) -> void:
 		print("Reference doesn't exist!: ", node_ref)
 
 
+# Select one to the right
+func select_right_cell():
+	var selected_cell = get_selected_cell_index()
+	if(selected_cell == null):
+		return
+	
+	# Select one to the right
+	selected_cell += 1
+	if(selected_cell >= cells.size()):
+		selected_cell = 0
+	
+	var new_cell = cells[selected_cell]
+	new_cell.get_node("TextureButton").grab_focus()
+
+
+# Select one to the left
+func select_left_cell():
+	var selected_cell = get_selected_cell_index()
+	if(selected_cell == null):
+		return
+	
+	# Select a cell one to the left
+	selected_cell -= 1
+	if(selected_cell < 0):
+		# selected_cell will be the last index
+		selected_cell = cells.size() - 1
+	
+	var new_cell = cells[selected_cell]
+	new_cell.get_node("TextureButton").grab_focus()
+
+
 # Actions for the middle mouse, to be executed inside an infinite function
 # like _physics_process
 func middle_mouse_manager() -> void:
@@ -121,28 +152,11 @@ func middle_mouse_manager() -> void:
 #			|| Input.is_joy_button_pressed(0, JOY_DPAD_LEFT)
 	var wheel_right = Input.is_mouse_button_pressed(BUTTON_WHEEL_RIGHT) \
 #			|| Input.is_joy_button_pressed(0, JOY_DPAD_RIGHT)
-	var selected_cell = get_selected_cell_index()
-	
-	if(selected_cell == null):
-		return
 	
 	if(wheel_up || wheel_right):
-		# Select a cell one to the right
-		selected_cell += 1
-		if(selected_cell >= cells.size()):
-			selected_cell = 0
-		
-		var new_cell = cells[selected_cell]
-		new_cell.get_node("TextureButton").grab_focus()
+		select_right_cell()
 	elif(wheel_down || wheel_left):
-		# Select a cell one to the left
-		selected_cell -= 1
-		if(selected_cell < 0):
-			# selected_cell will be the last index
-			selected_cell = cells.size() - 1
-		
-		var new_cell = cells[selected_cell]
-		new_cell.get_node("TextureButton").grab_focus()
+		select_left_cell()
 
 
 func get_selected_cell():
@@ -174,24 +188,24 @@ func remove_overflow() -> void:
 		self.overflow[i].queue_free()
 
 
+# Grab focus of the given cell
+func select_cell(selected_cell) -> void:
+	if(selected_cell):
+		var texture_btn = selected_cell.get_node("TextureButton")
+		
+		if(texture_btn is TextureButton):
+			texture_btn.grab_focus()
+
+
 func restore_focus() -> void:
 	if(self.prev_focused < cells.size()):
 		var selected_cell = self.cells[self.prev_focused]
 		
-		if(selected_cell):
-			var texture_btn = selected_cell.get_node("TextureButton")
-			
-			if(texture_btn is TextureButton):
-				texture_btn.grab_focus()
+		select_cell(selected_cell)
 	elif(self.cells.size() >= 1):
 		var selected_cell = self.cells[0]
 		
-		if(selected_cell):
-			var texture_btn = selected_cell.get_node(
-					"TextureButton")
-			
-			if(texture_btn is TextureButton):
-				texture_btn.grab_focus()
+		select_cell(selected_cell)
 
 
 # setget cells
@@ -231,6 +245,7 @@ func set_cells_textures(textures:Dictionary) -> bool:
 		if(cell.get("texture_button")):
 			var texture_button = cell.texture_button
 			
+			# TODO: Maybe use ObjectUtils.set_info()?
 			for prop in props_name:
 				if(texture_button.get(prop) && textures.has(prop) && \
 						textures[prop] is StreamTexture):
