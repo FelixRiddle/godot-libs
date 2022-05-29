@@ -12,6 +12,8 @@
 anchor_right = 0.292969
 anchor_bottom = 0.5
 rect_min_size = Vector2( 1, 1 )
+size_flags_horizontal = 6
+size_flags_vertical = 6
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_lock_": true,
@@ -38,21 +40,21 @@ __meta__ = {
 }
 
 [node name="Control" type="Control" parent="TextureButton"]
-anchor_left = 0.0357142
-anchor_top = 0.0357143
-anchor_right = 0.964286
-anchor_bottom = 0.964286
-margin_left = 10.0
-margin_top = 10.0
-margin_right = -10.0
-margin_bottom = -10.0
+anchor_left = 0.0741757
+anchor_top = 0.0741758
+anchor_right = 0.925825
+anchor_bottom = 0.925824
+margin_right = -1.52588e-05
+margin_bottom = 1.52588e-05
+mouse_filter = 2
 __meta__ = {
-"_edit_lock_": true
+"_edit_use_anchors_": true
 }
 
 [node name="ItemImage" type="TextureRect" parent="TextureButton/Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 
 [node name="Amount" type="Label" parent="TextureButton"]
 anchor_left = 7.33595e-09

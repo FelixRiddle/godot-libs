@@ -29,6 +29,9 @@ func _ready() -> void:
 
 # If required, call after setting the size for the cells
 func set_automatic_size():
+	# TODO: Change the cells position based on the space,
+	# and for that add the previous x position to the new cell plus
+	# the space between cells
 	if(self.debug):
 		print(debug_first_half + "set_automatic_size():")
 	
@@ -56,14 +59,14 @@ func set_automatic_size():
 	var space = remaining_width / 2
 	
 	
-	if(self.debug):
-		print("Cells min size: ", cell_min_size)
-		print("Space between cells: ", space_between_cells)
-		print("Combined cells width: ", combined_cells_width)
-		print("Full space width: ", full_space_width)
-		print("Full width: ", full_width)
-		print("Remaining width: ", remaining_width)
-		print("Space: ", space)
+#	if(self.debug):
+#		print("Cells min size: ", cell_min_size)
+#		print("Space between cells: ", space_between_cells)
+#		print("Combined cells width: ", combined_cells_width)
+#		print("Full space width: ", full_space_width)
+#		print("Full width: ", full_width)
+#		print("Remaining width: ", remaining_width)
+#		print("Space: ", space)
 	
 	# Set anchor top
 	anchor_top = 0
@@ -74,9 +77,9 @@ func set_automatic_size():
 	# Set anchor right to 1 - x_space
 	anchor_right = 1 - x_space
 	
-	if(self.debug):
-		print("x_space: ", x_space)
-		print("1 - x_space: ", 1 - x_space)
+#	if(self.debug):
+#		print("x_space: ", x_space)
+#		print("1 - x_space: ", 1 - x_space)
 	
 	# Set anchor bottom
 	# Top and bottom space
@@ -86,18 +89,18 @@ func set_automatic_size():
 	var remaining_height = reliable_viewport.y - full_height
 	# Because the anchor_bottom starts at 1
 	var y_space = 1 - UIUtils.get_y_pixel_percentage(remaining_height)
-	if(self.debug):
-		print("Full height: ", full_height)
-		print("Remaining height: ", remaining_height)
-		print("y_space: ", y_space)
+#	if(self.debug):
+#		print("Full height: ", full_height)
+#		print("Remaining height: ", remaining_height)
+#		print("y_space: ", y_space)
 	anchor_bottom = y_space
 	
-	if(self.debug):
-		print("Result: ")
-		print("Anchor left: ", anchor_left)
-		print("Anchor top: ", anchor_top)
-		print("Anchor right: ", anchor_right)
-		print("Anchor bottom: ", anchor_bottom)
+#	if(self.debug):
+#		print("Result: ")
+#		print("Anchor left: ", anchor_left)
+#		print("Anchor top: ", anchor_top)
+#		print("Anchor right: ", anchor_right)
+#		print("Anchor bottom: ", anchor_bottom)
 
 
 func get_cells_manager():

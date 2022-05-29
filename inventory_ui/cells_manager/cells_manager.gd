@@ -130,12 +130,9 @@ func get_cells_min_size() -> float:
 	return cells_min_size
 
 
-# Had a serious bug that I couldn't fix for hours so here is the list of
-# functions I used to try to fix it
-# Even though this object is created in a _ready() function
-# get_viewport() returns null, that's the main problem
-func get_default_rect_size():
-	var new_size = reliable_viewport.x * 0.05
+# Get the default rect size, which will be a 5% of the window width
+func get_default_rect_size() -> float:
+	var new_size:float = reliable_viewport.x * 0.05
 	return new_size
 
 
