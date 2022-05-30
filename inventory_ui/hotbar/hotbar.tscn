@@ -3,13 +3,6 @@
 [ext_resource path="res://godot-libs/inventory_ui/hotbar/hotbar.gd" type="Script" id=1]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends GridContainer
-
-func _gui_input(event):
-	if event is InputEventMouseButton:
-		print(\"Gui input overrided\")
-		print(\"Mouse pressed\")
-"
 
 [node name="Hotbar" type="Control"]
 anchor_right = 1.0

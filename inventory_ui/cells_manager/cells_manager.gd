@@ -74,6 +74,8 @@ func _add_cells(new_cells:Array, old_cells:Array) -> void:
 			grid_ref.add_child(cell)
 		elif(node_ref != null && node_ref is Control):
 			node_ref.add_child(cell)
+		else: # Add to this very node
+			self.add_child(cell)
 	
 	emit_signal("cells_changed", old_cells, new_cells)
 
@@ -81,7 +83,6 @@ func _add_cells(new_cells:Array, old_cells:Array) -> void:
 func _update_cells(new_cells:Array) -> void:
 	if(self.debug):
 		print("CellsManager -> _update_cells(new_cells):")
-		print("New cells: ", new_cells)
 	
 	# This new array, only has the remaining cells
 	var old_cells = self.cells.duplicate(true)
