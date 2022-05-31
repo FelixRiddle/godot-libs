@@ -156,7 +156,7 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 	var combined_cells_width = cell_min_size * length
 	# We multiply the space between cells by the amount of cells we have + 2
 	# because there will also be a space at the start and at the end
-	var full_space_width = (space_between_cells * (length + 2))
+	var full_space_width = (space_between_cells * (length + 1))
 	# Full hotbar width
 	var full_width = combined_cells_width + full_space_width
 	# Get the remaining width, in the rare case that the full_width is larger
