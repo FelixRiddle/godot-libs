@@ -12,6 +12,7 @@ var debug = true
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("Ready?")
+	cm.can_grab_focus = true
 	cm.set_cell_type(2)
 	print("Length: ", length)
 	print("Setting length")
@@ -21,6 +22,8 @@ func _ready():
 			"debug": debug,
 			"length": length,
 		})
+	print("Restoring focus: ")
+	cm.restore_focus()
 	print("Cells manager length: ", cm.length)
 	print("Cells manager type: ", typeof(cm))
 	
@@ -28,25 +31,18 @@ func _ready():
 	var anchors = UIExtra.set_hotbar_panel_anchors({
 			"info": {
 				"cells_min_size": cm.cells_min_size,
-				"debug": debug,
+				"debug": false,
 				"grid_container": cm,
 				"length": cm.length,
 			}
 		})
 	cm.update_cells_size()
 	
-	# Update cells position
-#	{
-#		"cells": [Node.new()],
-#		"cells_min_size": 1.1,
-#		"debug": false,
-#		"length": 1,
-#	}
 	UIExtra.set_cells_position({
 		"info": {
 			"cells": cm.cells,
 			"cells_manager": cm,
-			"debug": debug,
+			"debug": false,
 			"length": cm.length,
 		}
 	})

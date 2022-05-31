@@ -15,6 +15,7 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 # The length will likely be overrided
 export(int) var length:int = 0 setget set_length, get_length
 
+var can_grab_focus = false
 var cell_type = 1 setget set_cell_type, get_cell_type
 var cells:Array = [] setget set_cells, get_cells
 var cells_container = Node.new() setget set_cells_container, \
@@ -95,7 +96,8 @@ func _update_cells(new_cells:Array) -> void:
 		_add_cells(self.cells, old_cells)
 		
 		# Grab focus
-		restore_focus()
+		if(can_grab_focus):
+			restore_focus()
 		
 		if(debug):
 			print("Added cells to the scene!")
@@ -206,13 +208,20 @@ func remove_overflow() -> void:
 # Grab focus of the given cell
 func select_cell(selected_cell) -> void:
 	if(selected_cell):
-		var texture_btn = selected_cell.get_node("TextureButton")
-		
-		if(texture_btn is TextureButton):
-			texture_btn.grab_focus()
+		if(self.cell_type == 1):
+			var texture_btn = selected_cell.get_node("TextureButton")
+			
+			if(texture_btn is TextureButton):
+				texture_btn.grab_focus()
+		elif(self.cell_type == 2):
+			selected_cell.grab_focus()
 
 
 func restore_focus() -> void:
+	if(self.debug):
+		print("CellsManager -> restore_focus():")
+		print("Prev focused: ", self.prev_focused)
+	
 	if(self.prev_focused < cells.size()):
 		var selected_cell = self.cells[self.prev_focused]
 		
