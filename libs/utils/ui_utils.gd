@@ -10,8 +10,8 @@ static func get_reliable_viewport() -> Vector2:
 # These functions can be used to set the anchors
 static func get_x_pixel_percentage(pixels:float,
 		multiply_by_100:bool=false) -> float:
-	var w_size = get_reliable_viewport()
-	var result = pixels / w_size.x
+	var w_size = get_reliable_viewport().x
+	var result = pixels / w_size
 	
 	if(multiply_by_100):
 		return result * 100
@@ -21,8 +21,8 @@ static func get_x_pixel_percentage(pixels:float,
 
 static func get_y_pixel_percentage(pixels:float,
 		multiply_by_100:bool=false) -> float:
-	var w_size = get_reliable_viewport()
-	var result = pixels / w_size.y
+	var h_size = get_reliable_viewport().y
+	var result = pixels / h_size
 	
 	if(multiply_by_100):
 		return result * 100

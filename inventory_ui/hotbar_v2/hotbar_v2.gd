@@ -31,7 +31,7 @@ func _ready():
 	var anchors = UIExtra.set_hotbar_panel_anchors({
 			"info": {
 				"cells_min_size": cm.cells_min_size,
-				"debug": false,
+				"debug": debug,
 				"grid_container": cm,
 				"length": cm.length,
 			}
@@ -42,7 +42,7 @@ func _ready():
 		"info": {
 			"cells": cm.cells,
 			"cells_manager": cm,
-			"debug": false,
+			"debug": debug,
 			"length": cm.length,
 		}
 	})
