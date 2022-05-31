@@ -38,15 +38,16 @@ static func inventory_width(cells_size:float,
 
 
 static func inventory_height(cells_size:float,
-		length:int, debug:bool=false):
+		length, debug:bool=false):
 	var space_between_cells = space_between_cells()
 	
+	# Cell height * rows
 	var combined_cells_height = cells_size * length
 	# Set anchor bottom
 	# Top and bottom space
 	var full_space_height = space_between_cells * (length + 1)
 	# Add the cell space and the cell width/height
-	var inventory_height = full_space_height + cells_size
+	var inventory_height = full_space_height + combined_cells_height
 	
 	if(debug):
 		print("Cells min size: ", cells_size)
@@ -62,7 +63,7 @@ static func inventory_height(cells_size:float,
 # Get the remaining width:
 # Which is the full width of the viewport - the width of the object_size
 static func remaining_width(cells_size:float,
-		length:int, debug:bool=false):
+		length, debug:bool=false):
 	var reliable_viewport = UIUtils.get_reliable_viewport()
 	var inventory_width = inventory_width(cells_size, length)
 	
@@ -71,8 +72,9 @@ static func remaining_width(cells_size:float,
 	var remaining_width = reliable_viewport.x - inventory_width
 	
 	if(debug):
+		print("Window width: ", reliable_viewport.x)
+		print("Inventory width: ", inventory_width)
 		print("Remaining width: ", remaining_width)
-		print("Space: ", remaining_width / 2)
 	
 	return remaining_width
 
@@ -90,8 +92,6 @@ static func remaining_height(cells_size:float,
 	
 	if(debug):
 		print("Remaining height: ", remaining_height)
-		print("Space between the start of the screen to this node: ", \
-				remaining_height / 2, "(remaining_height / 2).")
 	
 	return remaining_height
 
@@ -180,12 +180,6 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 	if(debug):
 		print("UIExtra -> set_hotbar_panel_anchors(options:Dictionary):")
 	
-	# Variables
-	# Space between cells in pixels
-	# Here, 0.01 is equal to 1%
-	# Therefore, the result will be 1% of the screen width
-	var space_between_cells = space_between_cells()
-	
 	var remaining_width = remaining_width(cell_min_size, length)
 	# The remaining width / 2 will be the space between the start of the screen
 	# and the hotbar, it will also be the space from the end of the hotbar to
@@ -241,7 +235,9 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 static func center_inventory_anchors(options:Dictionary):
 	# Data required for this function to work properly
 	var required_data = {
-			"cells_manager": CellsManager.new()
+			"cells_manager": CellsManager.new(),
+			"inventory": Control.new(),
+			"rows": 1,
 		}
 	var DictionaryUtils = load("res://godot-libs/libs/" + \
 			"utils/dictionary_utils.gd")
@@ -264,10 +260,57 @@ static func center_inventory_anchors(options:Dictionary):
 	var anchor_left = 0
 	
 	var cm = info["cells_manager"]
-	var cell_min_size = cm["cells_min_size"]
+	var cells_min_size = cm["cells_min_size"]
 	var debug = info["debug"] if info.has("debug") else false
 	var length = cm["length"]
 	var reliable_viewport = UIUtils.get_reliable_viewport()
+	var rows = info["rows"]
 	
 	if(debug):
 		print("UIExtra -> set_hotbar_panel_anchors(options:Dictionary):")
+		print("Columns: ", length / rows)
+		print("Rows: ", rows)
+	
+	var remaining_width = remaining_width(cells_min_size, length / rows,
+			debug)
+	var remaining_height = remaining_height(cells_min_size, rows,
+			debug)
+	var horizontal_space = UIUtils.get_x_pixel_percentage(remaining_width / 2)
+	var vertical_space = UIUtils.get_y_pixel_percentage(remaining_height / 2)
+	anchor_top = vertical_space
+	anchor_right = 1 - horizontal_space
+	anchor_bottom = 1 - vertical_space
+	anchor_left = horizontal_space
+	
+	if(debug):
+		print("Result: ")
+		print("Anchor left: ", anchor_left)
+		print("Anchor top: ", anchor_top)
+		print("Anchor right: ", anchor_right)
+		print("Anchor bottom: ", anchor_bottom)
+	
+	# Result
+	var result = {
+			# Clockwise order
+			"anchor_top": anchor_top,
+			"anchor_right": anchor_right,
+			"anchor_bottom": anchor_bottom,
+			"anchor_left": anchor_left,
+		}
+	var inventory = info["inventory"]
+	ObjectUtils.set_info(inventory, result)
+	
+	# Update rect min size
+	var inventory_width = inventory_width(cells_min_size, length / rows)
+	var inventory_height = inventory_height(cells_min_size, rows)
+	var inventory_size = Vector2(inventory_width, inventory_height)
+	
+	if(debug):
+		print("Inventory size: ", inventory_size)
+	
+	ObjectUtils.set_info(inventory, {
+		"rect_size": inventory_size,
+		"rect_min_size": inventory_size,
+	})
+	
+	return result

@@ -15,7 +15,7 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 # The length will likely be overrided
 export(int) var length:int = 0 setget set_length, get_length
 
-var can_grab_focus = false
+var can_grab_focus = false setget set_can_grab_focus, get_can_grab_focus
 var cell_type = 1 setget set_cell_type, get_cell_type
 var cells:Array = [] setget set_cells, get_cells
 var cells_container = Node.new() setget set_cells_container, \
@@ -230,6 +230,13 @@ func restore_focus() -> void:
 		var selected_cell = self.cells[0]
 		
 		select_cell(selected_cell)
+
+
+# setget can_grab_focus
+func set_can_grab_focus(value:bool) -> void:
+	can_grab_focus = value
+func get_can_grab_focus() -> bool:
+	return can_grab_focus
 
 
 # setget cells

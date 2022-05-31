@@ -7,7 +7,7 @@ export(int) var length:int = 0
 
 onready var cm = $CellsManager
 
-var debug = true
+var debug = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

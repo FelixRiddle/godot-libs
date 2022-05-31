@@ -6,7 +6,7 @@ var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 export(int) var length:int = 0
 export(int) var rows:int = 1
 
-onready var cm = $CellsManager
+onready var cm = $Panel/ScrollContainer/CellsManager
 
 var debug = true
 
@@ -20,7 +20,7 @@ func _ready():
 	ObjectUtils.set_info(
 		cm,
 		{
-			"debug": debug,
+			"debug": false,
 			"length": length,
 		})
 	print("Restoring focus: ")
@@ -31,8 +31,10 @@ func _ready():
 	# Changing the size and the anchors
 	var anchors = UIExtra.center_inventory_anchors({
 			"info": {
+				"debug": false,
 				"cells_manager": cm,
-				"debug": debug,
+				"inventory": self,
+				"rows": rows,
 			}
 		})
 	cm.update_cells_size()
