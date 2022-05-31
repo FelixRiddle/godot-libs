@@ -3,7 +3,7 @@
 [ext_resource path="res://godot-libs/inventory_ui/cells_manager/cells_manager.gd" type="Script" id=1]
 [ext_resource path="res://godot-libs/inventory_ui/hotbar_v2/hotbar_v2.gd" type="Script" id=2]
 
-[node name="Hotbar" type="Control"]
+[node name="HotbarV2" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 2 )

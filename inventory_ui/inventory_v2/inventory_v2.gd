@@ -4,6 +4,7 @@ var UIExtra = preload("res://godot-libs/libs/utils/ui_extra.gd")
 var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
 export(int) var length:int = 0
+export(int) var rows:int = 1
 
 onready var cm = $CellsManager
 
@@ -28,24 +29,22 @@ func _ready():
 	print("Cells manager type: ", typeof(cm))
 	
 	# Changing the size and the anchors
-	var anchors = UIExtra.set_hotbar_panel_anchors({
+	var anchors = UIExtra.center_inventory_anchors({
 			"info": {
-				"cells_min_size": cm.cells_min_size,
+				"cells_manager": cm,
 				"debug": debug,
-				"grid_container": cm,
-				"length": cm.length,
 			}
 		})
 	cm.update_cells_size()
-	
-	UIExtra.set_cells_position({
-		"info": {
-			"cells": cm.cells,
-			"cells_manager": cm,
-			"debug": debug,
-			"length": cm.length,
-		}
-	})
+#
+#	UIExtra.set_cells_position({
+#		"info": {
+#			"cells": cm.cells,
+#			"cells_manager": cm,
+#			"debug": debug,
+#			"length": cm.length,
+#		}
+#	})
 
 
 func _input(event):

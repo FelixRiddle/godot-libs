@@ -13,6 +13,7 @@ static func space_between_cells():
 	
 	return space_between_cells
 
+
 static func inventory_width(cells_size:float,
 		length:int, debug:bool=false):
 	var space_between_cells = space_between_cells()
@@ -95,51 +96,19 @@ static func remaining_height(cells_size:float,
 	return remaining_height
 
 
-# dict1 is the provided dictionary
-static func key_type_match(dict1, dict2, key):
-	return dict1.has(key) && \
-			typeof(dict1[key]) == typeof(dict2[key])
-
-
-static func validate_cells_options(options:Dictionary={
-		"default_info": true,
-		"info": {} }):
-	
-	if(options.has("default_info") && options["default_info"]):
-		print("[-] Default information given")
-		# Get outta here
-		return
-	
-	var data_placeholder = {
+# Set hotbar cells accordingly
+static func set_cells_position(options:Dictionary):
+	# Data required for this function to work properly
+	var required_data = {
 			"cells": [Node.new()],
 			"cells_manager": TextureButton.new(),
 			"debug": false,
 			"length": 1,
 		}
-	var info
-	if(options.has("info")):
-		info = options["info"]
-		
-		if(typeof(info) == TYPE_DICTIONARY):
-			for key in data_placeholder.keys():
-				if(!key_type_match(info, data_placeholder, key)):
-					print("[-] The key ", key, " wasn't given.")
-					# Get outta here
-					return
-			
-			return true
-		else:
-			print("[-] Info it's not a dictionary")
-			# Get outta here
-			return
-	else:
-		print("[-] Doesn't have info(data)")
-		# Get outta here
-		return
-
-
-static func set_cells_position(options:Dictionary):
-	if(!validate_cells_options(options)):
+	var DictionaryUtils = load("res://godot-libs/libs/" + \
+			"utils/dictionary_utils.gd")
+	var valid_data = DictionaryUtils.validate_options(options, required_data)
+	if(!valid_data):
 		# Get outta here
 		return
 	
@@ -150,7 +119,7 @@ static func set_cells_position(options:Dictionary):
 	
 	var cells = info["cells"]
 	var cm = info["cells_manager"]
-	var debug = info["debug"]
+	var debug = info["debug"] if info.has("debug") else false
 	var length = info["length"]
 	
 	if(debug):
@@ -173,51 +142,20 @@ static func set_cells_position(options:Dictionary):
 		position_x += cells_min_size + space_between_cells
 
 
-static func validate_options(options:Dictionary={
-		"default_info": true,
-		"info": {},
-		}):
-	
-	print("Information given: ", options)
-	
-	if(options.has("default_info") && options["default_info"]):
-		print("[-] Default information given")
-		# Get outta here
-		return
-	
-	var data_placeholder = {
-			"cells_min_size": 1.1,
-			"debug": false,
-			"grid_container": GridContainer.new(),
-			"length": 1,
-		}
-	var info
-	if(options.has("info")):
-		info = options["info"]
-		
-		if(typeof(info) == TYPE_DICTIONARY):
-			for key in data_placeholder.keys():
-				if(!key_type_match(info, data_placeholder, key)):
-					print("[-] The key ", key, " wasn't given.")
-					# Get outta here
-					return
-			
-			return true
-		else:
-			print("[-] Info it's not a dictionary")
-			# Get outta here
-			return
-	else:
-		print("[-] Doesn't have info(data)")
-		# Get outta here
-		return
-
-
 # If required, call after setting the size for the cells
 # Returns null if the information provided is wrong
 static func set_hotbar_panel_anchors(options:Dictionary):
-	print("set_hotbar_panel_anchors")
-	if(!validate_options(options)):
+	# This data is necesary, for this function to work
+	# other data, like debug, is optional
+	var required_data = {
+			"cells_min_size": 1.1,
+			"grid_container": GridContainer.new(),
+			"length": 1,
+		}
+	var DictionaryUtils = load("res://godot-libs/libs/" + \
+			"utils/dictionary_utils.gd")
+	var valid_data = DictionaryUtils.validate_options(options, required_data)
+	if(!valid_data):
 		# Get outta here
 		return
 	
@@ -235,7 +173,7 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 	var anchor_left = 0
 	
 	var cell_min_size = info["cells_min_size"]
-	var debug = info["debug"]
+	var debug = info["debug"] if info.has("debug") else false
 	var length = info["length"]
 	var reliable_viewport = UIUtils.get_reliable_viewport()
 	
@@ -267,14 +205,8 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 		print("x_space: ", x_space)
 		print("1 - x_space: ", 1 - x_space)
 	
-#	# Set anchor bottom
-#	# Top and bottom space
-#	var y_cell_space = space_between_cells * 2
-#	# Add the cell space and the cell width/height
-#	var full_height = y_cell_space + cell_min_size
-#	var remaining_height = reliable_viewport.y - full_height
+	# hotbar_height - Windows height
 	var remaining_height = remaining_height(cell_min_size, 1, debug)
-	
 	# Because the anchor_bottom starts at 1
 	var y_space = 1 - UIUtils.get_y_pixel_percentage(remaining_height)
 	if(debug):
@@ -304,3 +236,38 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 	ObjectUtils.set_info(gc, result)
 	
 	return result
+
+
+static func center_inventory_anchors(options:Dictionary):
+	# Data required for this function to work properly
+	var required_data = {
+			"cells_manager": CellsManager.new()
+		}
+	var DictionaryUtils = load("res://godot-libs/libs/" + \
+			"utils/dictionary_utils.gd")
+	var valid_data = DictionaryUtils.validate_options(options, required_data)
+	if(!valid_data):
+		# Get outta here
+		return
+	
+	var info = options["info"]
+	
+	# Load some modules
+	var UIUtils = load("res://godot-libs/libs/utils/ui_utils.gd")
+	var ObjectUtils = load("res://godot-libs/libs/utils/object_utils.gd")
+	
+	# Variables
+	# Anchors final value will be stored here
+	var anchor_top = 0
+	var anchor_right = 0
+	var anchor_bottom = 0
+	var anchor_left = 0
+	
+	var cm = info["cells_manager"]
+	var cell_min_size = cm["cells_min_size"]
+	var debug = info["debug"] if info.has("debug") else false
+	var length = cm["length"]
+	var reliable_viewport = UIUtils.get_reliable_viewport()
+	
+	if(debug):
+		print("UIExtra -> set_hotbar_panel_anchors(options:Dictionary):")
