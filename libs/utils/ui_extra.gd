@@ -1,8 +1,8 @@
 class_name UIExtra
 
 # dict1 is the provided dictionary
-static func key_exists_and_types_match(dict1, dict2, key):
-	return dict1.has(key) != null && \
+static func key_type_match(dict1, dict2, key):
+	return dict1.has(key) && \
 			typeof(dict1[key]) == typeof(dict2[key])
 
 
@@ -10,17 +10,15 @@ static func validate_cells_options(options:Dictionary={
 		"default_info": true,
 		"info": {} }):
 	
-	print("Information given: ", options)
-	
 	if(options.has("default_info") && options["default_info"]):
 		print("[-] Default information given")
 		# Get outta here
 		return
 	
 	var data_placeholder = {
-			"cells": Node.new(),
+			"cells": [Node.new()],
+			"cells_manager": TextureButton.new(),
 			"debug": false,
-			"grid_container": Node.new(),
 			"length": 1,
 		}
 	var info
@@ -29,7 +27,7 @@ static func validate_cells_options(options:Dictionary={
 		
 		if(typeof(info) == TYPE_DICTIONARY):
 			for key in data_placeholder.keys():
-				if(!key_exists_and_types_match(info, data_placeholder, key)):
+				if(!key_type_match(info, data_placeholder, key)):
 					print("[-] The key ", key, " wasn't given.")
 					# Get outta here
 					return
@@ -54,7 +52,29 @@ static func set_cells_position(options:Dictionary):
 	# the space between cells
 	var info = options["info"]
 	
+	var cells = info["cells"]
+	var cm = info["cells_manager"]
+	var debug = info["debug"]
+	var length = info["length"]
 	
+	if(debug):
+		print("UIExtra -> set_cells_position(options:Dictionary):")
+	
+	# Space between cells in pixels
+	# Here, 0.01 is equal to 1%
+	# Therefore, the result will be 1% of the screen width
+	var reliable_viewport = UIUtils.get_reliable_viewport()
+	var space_between_cells = reliable_viewport.x \
+			* 0.01
+	var cells_min_size = cm.cells_min_size
+	
+	var position_x = space_between_cells
+	var position_y = space_between_cells
+	for i in range(length):
+		var cell = cells[i]
+		
+		cell.rect_position = Vector2(position_x, position_y)
+		position_x += cells_min_size + space_between_cells
 
 
 static func validate_options(options:Dictionary={
@@ -81,7 +101,7 @@ static func validate_options(options:Dictionary={
 		
 		if(typeof(info) == TYPE_DICTIONARY):
 			for key in data_placeholder.keys():
-				if(!key_exists_and_types_match(info, data_placeholder, key)):
+				if(!key_type_match(info, data_placeholder, key)):
 					print("[-] The key ", key, " wasn't given.")
 					# Get outta here
 					return
@@ -124,7 +144,7 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 	var reliable_viewport = UIUtils.get_reliable_viewport()
 	
 	if(debug):
-		print("UIExtra -> set_automatic_size():")
+		print("UIExtra -> set_hotbar_panel_anchors(options:Dictionary):")
 	
 	# Variables
 	# Space between cells in pixels

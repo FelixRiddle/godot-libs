@@ -34,4 +34,20 @@ func _ready():
 			}
 		})
 	cm.update_cells_size()
+	
+	# Update cells position
+#	{
+#		"cells": [Node.new()],
+#		"cells_min_size": 1.1,
+#		"debug": false,
+#		"length": 1,
+#	}
+	UIExtra.set_cells_position({
+		"info": {
+			"cells": cm.cells,
+			"cells_manager": cm,
+			"debug": debug,
+			"length": cm.length,
+		}
+	})
 
