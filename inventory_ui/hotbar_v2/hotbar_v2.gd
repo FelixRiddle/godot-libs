@@ -12,7 +12,7 @@ var debug = true
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("Ready?")
-	cm.set_cell_version(2)
+	cm.set_cell_type(2)
 	print("Length: ", length)
 	print("Setting length")
 	ObjectUtils.set_info(
@@ -51,3 +51,6 @@ func _ready():
 		}
 	})
 
+
+func _input(event):
+	cm.middle_mouse_manager()

@@ -15,7 +15,10 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 # The length will likely be overrided
 export(int) var length:int = 0 setget set_length, get_length
 
+var cell_type = 1 setget set_cell_type, get_cell_type
 var cells:Array = [] setget set_cells, get_cells
+var cells_container = Node.new() setget set_cells_container, \
+		get_cells_container
 var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
 var grid_ref = Node.new() setget set_grid_ref, get_grid_ref
 var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
@@ -112,7 +115,10 @@ func select_right_cell():
 		selected_cell = 0
 	
 	var new_cell = cells[selected_cell]
-	new_cell.get_node("TextureButton").grab_focus()
+	if(self.cell_type == 1):
+		new_cell.get_node("TextureButton").grab_focus()
+	elif(self.cell_type == 2):
+		new_cell.grab_focus()
 
 
 # Select one to the left
@@ -128,7 +134,10 @@ func select_left_cell():
 		selected_cell = cells.size() - 1
 	
 	var new_cell = cells[selected_cell]
-	new_cell.get_node("TextureButton").grab_focus()
+	if(self.cell_type == 1):
+		new_cell.get_node("TextureButton").grab_focus()
+	elif(self.cell_type == 2):
+		new_cell.grab_focus()
 
 
 # Actions for the middle mouse, to be executed inside an infinite function
@@ -173,10 +182,15 @@ func get_selected_cell():
 
 func get_selected_cell_index():
 	for i in range(cells.size()):
-		# We need the texture button state
-		var tb:TextureButton = cells[i].get_node("TextureButton")
-		if(tb.has_focus()):
-			return i
+		if(self.cell_type == 1):
+			# We need the texture button state
+			var tb:TextureButton = cells[i].get_node("TextureButton")
+			if(tb.has_focus()):
+				return i
+		elif(self.cell_type == 2):
+			# The node is the texture button
+			if(cells[i].has_focus()):
+				return i
 	return null
 
 
@@ -209,15 +223,6 @@ func restore_focus() -> void:
 		select_cell(selected_cell)
 
 
-func set_cell_version(value):
-	if(value == 1):
-		Cell = load("res://godot-libs/inventory_ui/" + \
-				"cells_manager/cell/cell.tscn")
-	elif(value == 2):
-		Cell = load("res://godot-libs/inventory_ui/" + \
-				"cells_manager/cell_v2/cell_v2.tscn")
-
-
 # setget cells
 func set_cells(value:Array) -> void:
 	cells = value
@@ -241,6 +246,12 @@ func update_cells_size():
 			# Set rect min size
 			cell.rect_min_size = Vector2(
 					self.cells_min_size, self.cells_min_size)
+
+
+func set_cells_container(node_path:String) -> void:
+	cells_container = get_node(node_path)
+func get_cells_container():
+	return cells_container
 
 
 # setget min_size
@@ -278,6 +289,38 @@ func change_cells_textures(textures:Dictionary) -> bool:
 	return set_cells_textures(textures)
 func change_cells_sprites(textures:Dictionary) -> bool:
 	return set_cells_textures(textures)
+
+
+func set_cell_type(value:int) -> void:
+	cell_type = value
+	update_cell_type()
+func get_cell_type() -> int:
+	return cell_type
+
+
+func update_cell_type():
+	if(debug):
+		print("CellsManager -> update_cell_type():")
+	
+	# Set cell type
+	if(self.cell_type == 1):
+		Cell = load("res://godot-libs/inventory_ui/" + \
+				"cells_manager/cell/cell.tscn")
+	elif(self.cell_type == 2):
+		Cell = load("res://godot-libs/inventory_ui/" + \
+				"cells_manager/cell_v2/cell_v2.tscn")
+	
+	# Update the cells
+	var result:Dictionary = ArrayUtils.smart_change_length(
+			self.cells,
+			self.length,
+			Cell,
+			{
+				"debug": self.debug,
+			})
+	
+	if("new_array" in result):
+		_update_cells(result["new_array"])
 
 
 # Get the default rect size, which will be a 5% of the window width
