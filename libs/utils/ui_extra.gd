@@ -1,18 +1,14 @@
 class_name UIExtra
 
-static func get_automatic_size_info_keys():
-	return ["cells_min_size", "debug", "grid_container", "length"]
+# dict1 is the provided dictionary
+static func key_exists_and_types_match(dict1, dict2, key):
+	return dict1.has(key) != null && \
+			typeof(dict1[key]) == typeof(dict2[key])
 
-# If required, call after setting the size for the cells
-# Returns null if the information provided is wrong
-static func set_hotbar_panel_anchors(options:Dictionary={
+
+static func validate_cells_options(options:Dictionary={
 		"default_info": true,
-		"info": {
-			"cells_min_size": 1,
-			"debug": false,
-			"grid_container": Node.new(),
-			"length": 1,
-		} }):
+		"info": {} }):
 	
 	print("Information given: ", options)
 	
@@ -21,26 +17,95 @@ static func set_hotbar_panel_anchors(options:Dictionary={
 		# Get outta here
 		return
 	
+	var data_placeholder = {
+			"cells": Node.new(),
+			"debug": false,
+			"grid_container": Node.new(),
+			"length": 1,
+		}
 	var info
 	if(options.has("info")):
 		info = options["info"]
 		
 		if(typeof(info) == TYPE_DICTIONARY):
-			for key in get_automatic_size_info_keys():
-				if(!info.has(key)):
+			for key in data_placeholder.keys():
+				if(!key_exists_and_types_match(info, data_placeholder, key)):
 					print("[-] The key ", key, " wasn't given.")
 					# Get outta here
 					return
+			
+			return true
 		else:
 			print("[-] Info it's not a dictionary")
 			# Get outta here
 			return
 	else:
-		print("[-] Doesn't have info")
+		print("[-] Doesn't have info(data)")
+		# Get outta here
+		return
+
+static func set_cells_position(options:Dictionary):
+	if(!validate_cells_options(options)):
 		# Get outta here
 		return
 	
-	# Safe to proceed
+	# TODO: Change the cells position based on the space,
+	# and for that add the previous x position to the new cell plus
+	# the space between cells
+	var info = options["info"]
+	
+	
+
+
+static func validate_options(options:Dictionary={
+		"default_info": true,
+		"info": {},
+		}):
+	
+	print("Information given: ", options)
+	
+	if(options.has("default_info") && options["default_info"]):
+		print("[-] Default information given")
+		# Get outta here
+		return
+	
+	var data_placeholder = {
+			"cells_min_size": 1.1,
+			"debug": false,
+			"grid_container": GridContainer.new(),
+			"length": 1,
+		}
+	var info
+	if(options.has("info")):
+		info = options["info"]
+		
+		if(typeof(info) == TYPE_DICTIONARY):
+			for key in data_placeholder.keys():
+				if(!key_exists_and_types_match(info, data_placeholder, key)):
+					print("[-] The key ", key, " wasn't given.")
+					# Get outta here
+					return
+			
+			return true
+		else:
+			print("[-] Info it's not a dictionary")
+			# Get outta here
+			return
+	else:
+		print("[-] Doesn't have info(data)")
+		# Get outta here
+		return
+
+
+# If required, call after setting the size for the cells
+# Returns null if the information provided is wrong
+static func set_hotbar_panel_anchors(options:Dictionary):
+	print("set_hotbar_panel_anchors")
+	if(!validate_options(options)):
+		# Get outta here
+		return
+	
+	var info = options["info"]
 	
 	# Load some modules
 	var UIUtils = load("res://godot-libs/libs/utils/ui_utils.gd")
@@ -58,9 +123,6 @@ static func set_hotbar_panel_anchors(options:Dictionary={
 	var length = info["length"]
 	var reliable_viewport = UIUtils.get_reliable_viewport()
 	
-	# TODO: Change the cells position based on the space,
-	# and for that add the previous x position to the new cell plus
-	# the space between cells
 	if(debug):
 		print("UIExtra -> set_automatic_size():")
 	

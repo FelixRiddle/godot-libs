@@ -17,7 +17,7 @@ export(int) var length:int = 0 setget set_length, get_length
 
 var cells:Array = [] setget set_cells, get_cells
 var cells_min_size:float = 0 setget set_cells_min_size, get_cells_min_size
-var grid_ref = GridContainer.new() setget set_grid_ref, get_grid_ref
+var grid_ref = Node.new() setget set_grid_ref, get_grid_ref
 var inventory:Inventory = InventoryScript.new({"debug": self.debug}) \
 		setget set_inventory, get_inventory
 var node_ref = Node.new() setget set_node_ref, get_node_ref
@@ -209,6 +209,15 @@ func restore_focus() -> void:
 		select_cell(selected_cell)
 
 
+func set_cell_version(value):
+	if(value == 1):
+		Cell = load("res://godot-libs/inventory_ui/" + \
+				"cells_manager/cell/cell.tscn")
+	elif(value == 2):
+		Cell = load("res://godot-libs/inventory_ui/" + \
+				"cells_manager/cell_v2/cell_v2.tscn")
+
+
 # setget cells
 func set_cells(value:Array) -> void:
 	cells = value
@@ -216,20 +225,32 @@ func get_cells() -> Array:
 	return cells
 
 
-# setget min_size
-func set_cells_min_size(value:float) -> void:
-	if(debug):
-		print("CellsManager -> set_cells_min_size:")
-	print("---- Set cells min size: ", value)
-	cells_min_size = value
-	
+func update_cells_size():
 	# Change every cell size
 	if(debug):
+		print("CellsManager -> update_cells_size():")
 		print("Resizing every cell")
-	for cell in cells:
-		if(cell.get("rect_min_size") && value > 1):
+	
+	for cell in self.cells:
+		if(cell.get("rect_min_size")):
+			
+			# Set rect size
+			cell.rect_size = Vector2(
+					self.cells_min_size, self.cells_min_size)
+			
+			# Set rect min size
 			cell.rect_min_size = Vector2(
 					self.cells_min_size, self.cells_min_size)
+
+
+# setget min_size
+func set_cells_min_size(value:float) -> void:
+	if(self.debug):
+		print("CellsManager -> set_cells_min_size:")
+		print("Set cells min size: ", value)
+	cells_min_size = value
+	
+	update_cells_size()
 func get_cells_min_size() -> float:
 	return cells_min_size
 

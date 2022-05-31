@@ -1,5 +1,5 @@
-extends Control
-class_name Cell
+extends TextureButton
+class_name CellV2
 
 # Objectives:
 # [] Do an ui that works with the inventory class
@@ -15,8 +15,6 @@ class_name Cell
 
 signal updated
 
-onready var texture_button:TextureButton = $TextureButton
-
 var updated:bool = false setget set_updated, get_updated
 
 func _ready():
@@ -29,15 +27,15 @@ func _ready():
 # Set and get amount item label
 func set_item_amount(value:int) -> void:
 	if(value > 1):
-		var label:Label = $TextureButton/Amount
+		var label:Label = get_amount_label()
 		label.text = String(value)
 func get_item_amount() -> int:
-	var label:Label = $TextureButton/Amount
+	var label:Label = get_amount_label()
 	return int(label.text)
 
 
 func get_amount_label():
-	return $TextureButton/Amount
+	return $Amount
 
 
 # setget item_image
@@ -46,15 +44,22 @@ func set_item_image(value) -> void:
 		value = load(value)
 	
 	if(value is Texture):
-		var texture_rect:TextureRect = $TextureButton/Control/ItemImage
+		var texture_rect:TextureRect = get_item_image_node()
 		texture_rect.set_texture(value)
 func get_item_image():
-	var texture_rect:TextureRect = $TextureButton/Control/ItemImage
+	var texture_rect:TextureRect = get_item_image_node()
 	return texture_rect.get_texture()
 
 
-func get_item_image_texture_rect():
-	return $TextureButton/Control/ItemImage
+func get_item_image_node():
+	return $ItemImage
+
+
+#func set_rect_size(value:Vector2) -> void:
+#	print(" ------- Successfully overriden")
+#	rect_size = value
+#func get_rect_size() -> Vector2:
+	return rect_size
 
 
 # setget updated
