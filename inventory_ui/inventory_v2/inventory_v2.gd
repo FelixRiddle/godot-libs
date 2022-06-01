@@ -35,12 +35,12 @@ func _ready():
 				"columns": 9,
 				"debug": false,
 				"cells_manager": cm,
-				"inventory": background_color,
+				"inventory": self,
 				"rows": ui_rows,
 			}
 		})
-	ObjectUtils.set_info($CellsContainer, anchors)
-	
+#	ObjectUtils.set_info($CellsContainer, anchors)
+
 	# We add a little offset to center it
 	var space = UIExtra.space_between_cells()
 	var h_anchor_space = UIUtils.get_x_pixel_percentage(space)
@@ -48,17 +48,17 @@ func _ready():
 	var sc = find_node("ScrollContainer")
 	if(ui_rows >= rows):
 		sc.anchor_top += v_anchor_space * 1.6
-		sc.anchor_right += h_anchor_space * 2
-		sc.anchor_bottom += v_anchor_space * 1.6
+		sc.anchor_right -= h_anchor_space * 2
+		sc.anchor_bottom -= v_anchor_space * 1.6
 		sc.anchor_left += h_anchor_space * 2
 	elif(ui_rows < rows):
-		sc.anchor_top += v_anchor_space * 2
-		sc.anchor_right += h_anchor_space * 2
-		sc.anchor_bottom += v_anchor_space * 2
-		sc.anchor_left += h_anchor_space * 2
+		self.anchor_right += h_anchor_space * 3
+		self.anchor_bottom += v_anchor_space * 1.6
 		
-		background_color.anchor_right += h_anchor_space * 2
-		background_color.anchor_bottom += v_anchor_space * 1.6
+		sc.anchor_top += v_anchor_space * 2
+		sc.anchor_right -= h_anchor_space * 2
+		sc.anchor_bottom -= v_anchor_space * 2
+		sc.anchor_left += h_anchor_space * 2
 		
 		
 	print("Horizontal anchor space: ", h_anchor_space)
