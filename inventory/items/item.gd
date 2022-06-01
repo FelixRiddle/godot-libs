@@ -19,10 +19,12 @@ export(String) var scene_path:String = "" setget set_scene_path, \
 export var item_amount = 0 setget set_amount, get_amount
 export var item_capacity = 1 setget set_capacity, get_capacity
 export var item_description = "Sample text" \
-	setget set_id, get_id
+		setget set_id, get_id
 export var item_id = 0 setget set_id, get_id
 # Path to the item image
 export var item_image = "" setget set_item_image, get_item_image
+export var item_image_path = "" \
+		setget set_item_image_path,get_item_image_path
 export var item_name = "" setget set_name, get_name
 # The slot must be a value between 1 and 10 inclusive
 export var item_slot = 0 setget set_slot, get_slot
@@ -35,17 +37,17 @@ var uuid = uuid_util.v4() setget , get_uuid
 var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
-# Add items
-# IDK what this is, but it's very wrong.
-# TODO: Fix this sh*t
-func add(amount:int) -> bool:
+## Add items
+## IDK what this is, but it's very wrong.
+## TODO: Fix this sh*t
+#func add(amount:int) -> bool:
 #	if(self.item_capacity >= amount):
 #		return false
 #	elif(self.item_capacity < amount):
 #		# Add up to the item_capacity
 #		return false
-	item_amount += amount
-	return true
+#	item_amount += amount
+#	return true
 
 
 # Create a new by a given dictionary of stats
@@ -328,6 +330,13 @@ func set_item_image(value) -> void:
 	item_image = new_image
 func get_item_image():
 	return item_image
+
+
+# setget item_image_path
+func set_item_image_path(value:String) -> void:
+	item_image_path = value
+func get_item_image_path() -> String:
+	return item_image_path
 
 
 ### Item name

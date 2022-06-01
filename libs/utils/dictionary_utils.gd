@@ -9,12 +9,14 @@ static func key_type_match(dict1, dict2, key):
 static func validate_options(options:Dictionary={
 		"default_info": true,
 		"info": {},
-		}, required_data:Dictionary={
+		},
+		# Second parameter xD
+		required_data:Dictionary={
 			"default_info": true,
 		}):
 	
 	# Data to compare, if a key is not required, remove it from here
-	if(required_data.has("default_info")):
+	if(required_data.has("default_info") && required_data["default_info"]):
 		print("[-] Default information given")
 		# Get outta here
 		return

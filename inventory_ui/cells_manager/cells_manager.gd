@@ -41,10 +41,6 @@ func _init(options:Dictionary = { "info": { } }):
 	var _connect_result = inventory.connect("inventory_changed", self, \
 			"_on_inventory_inventory_changed")
 	
-	# Connect size changed
-	_connect_result = inventory.connect("size_changed", self,
-			"_on_inventory_size_changed")
-	
 	# Set information
 	if(typeof(options) == TYPE_DICTIONARY && options.has("info") && \
 			typeof(options["info"]) == TYPE_DICTIONARY):
@@ -349,11 +345,11 @@ func get_default_rect_size() -> float:
 
 
 # setget debug
-func set_debug(value:bool) -> void:
+func set_debug(value:bool, recursive:bool=true) -> void:
 	debug = value
 	
 	# Also set debug for the inventory class
-	if(inventory.get("debug")):
+	if(recursive):
 		inventory.debug = self.debug
 func get_debug() -> bool:
 	return debug
@@ -381,6 +377,9 @@ func set_length(value:int) -> void:
 	# For later use, set updated to false
 	for cell in self.cells:
 		cell.updated = false
+	
+	# Update inventory size
+	inventory.size = length
 	
 	var old_length:int = length
 	length = value
@@ -438,12 +437,3 @@ func _on_inventory_inventory_changed(old_inv:Dictionary = {},
 			new_inv_ref:Dictionary = {}) -> void:
 	if(debug):
 		print("CellsManager -> _on_inventory_inventory_changed:")
-	
-	pass
-
-# When the inventory length/size changes
-func _on_inventory_size_changed(old_size:int, new_size:int) -> void:
-	if(debug):
-		print("CellsManager -> _on_inventory_size_changed:")
-	
-	set_length(new_size)

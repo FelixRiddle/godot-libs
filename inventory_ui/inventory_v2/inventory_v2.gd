@@ -8,25 +8,32 @@ export(int) var length:int = 0
 export(int) var rows:int = 1
 export(int) var ui_rows:int = 4
 
-onready var cm = find_node("CellsManager")
+onready var cells_manager = find_node("CellsManager")
 
-var debug = true
+var debug = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("HotbarV2 -> _ready():")
+	var cm = cells_manager
+	
+	if(debug):
+		print("HotbarV2 -> _ready():")
 	cm.can_grab_focus = false
 	cm.set_cell_type(2)
-	print("Length: ", length)
-	print("Setting length")
+	
+	if(debug):
+		print("Length: ", length)
+		print("Setting length")
 	ObjectUtils.set_info(
 		cm,
 		{
 			"debug": debug,
 			"length": length,
 		})
-	print("Cells manager length: ", cm.length)
-	print("Cells manager type: ", typeof(cm))
+	
+	if(debug):
+		print("Cells manager length: ", cm.length)
+		print("Cells manager type: ", typeof(cm))
 	
 	# Changing the size and the anchors
 	var background_color = find_node("BackgroundColor")
@@ -39,8 +46,7 @@ func _ready():
 				"rows": ui_rows,
 			}
 		})
-#	ObjectUtils.set_info($CellsContainer, anchors)
-
+	
 	# We add a little offset to center it
 	var space = UIExtra.space_between_cells()
 	var h_anchor_space = UIUtils.get_x_pixel_percentage(space)
@@ -59,24 +65,25 @@ func _ready():
 		sc.anchor_right -= h_anchor_space * 2
 		sc.anchor_bottom -= v_anchor_space * 2
 		sc.anchor_left += h_anchor_space * 2
-		
-		
-	print("Horizontal anchor space: ", h_anchor_space)
-	print("Vertical anchor space: ", v_anchor_space)
+	
+	if(debug):
+		print("Horizontal anchor space: ", h_anchor_space)
+		print("Vertical anchor space: ", v_anchor_space)
 	
 	cm.update_cells_size()
 	
 	cm.add_constant_override("hseparation", space)
 	cm.add_constant_override("vseparation", space)
-#	UIExtra.set_cells_position({
-#		"info": {
-#			"cells": cm.cells,
-#			"cells_manager": cm,
-#			"debug": debug,
-#			"length": cm.length,
-#		}
-#	})
 
 
 func _input(event):
-	cm.middle_mouse_manager()
+	cells_manager.middle_mouse_manager()
+
+
+func get_inventory_script():
+	return cells_manager.inventory
+func add_item_by_id(item_id, amount):
+	return cells_manager.inventory.add_item_by_id({
+		"id": item_id,
+		"amount": amount,
+	})

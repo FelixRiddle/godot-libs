@@ -1,12 +1,15 @@
 # Inventory interface for item management
-# This is an interface for an inventory with minecraft, terraria-like type
-# of inventory
+# This is an interface for an inventory system
+# like minecraft or terraria, with the exception that it
+# uses a dictionary to store items
 
 # The name of this class
 class_name Inventory
 
 # Load class/es
-var Item = load("res://godot-libs/inventory/items/item.gd")
+var DictionaryUtils = preload(
+		"res://godot-libs/libs/utils/dictionary_utils.gd")
+var Item = preload("res://godot-libs/inventory/items/item.gd")
 
 # Signals
 # The new inv is a reference to the actual inventory, remember that
@@ -49,8 +52,18 @@ func set_items(value):
 func get_items():
 	return items.duplicate()
 
-#func add(item: Item, amount: int = 1):
-#	pass
+
+# Try to place an item on another item
+# TODO: Surely this won't work pretty well, so it needs some fixing
+# [] 1. It will duplicate items if the inventories are different
+func try_place(item, prev_item):
+	if(item && prev_item):
+		items[item.get_uuid()] = prev_item
+		items[prev_item.get_uuid()] = item
+		return true
+	else:
+		return false
+
 
 # Add item by its id
 # This functions adds an item by searching its id on the ItemsDatabase
@@ -58,10 +71,40 @@ func get_items():
 # adds it to the inventory.
 # id: The item id in the database or different id to create a new item
 # amount: The amount to add to the items
-# The return is unreliable, it will only return one copy of the inserted items
-func add_item_by_id(id, amount):
+# It can return Item, Array or null
+func add_item_by_id(item_data:Dictionary={
+			"_": {
+					"default_dictionary": true,
+				},
+			"info": { }
+			}):
 	if(debug):
 		print("Inventory.gd -> add_item_by_id(id, amount):")
+	
+	var id
+	var amount
+	
+	if(item_data.has("_") && item_data.has("default_dictionary") &&
+			item_data["default_dictionary"]):
+		# Get outta here
+		return
+	elif(item_data.has("info")):
+		var required_data:Dictionary = {
+			"id": 1,
+			"amount": 1,
+		}
+		var validated = DictionaryUtils.validate_options(
+			item_data["info"],
+			required_data)
+		
+		if(validated):
+			var info = item_data["info"]
+			id = info["id"]
+			amount = info["amount"]
+			
+	else:
+		# Get outta here
+		return
 	
 	# Check if the item already exists and if it has space available
 	var items_found = get_items_by_id(id)
@@ -74,12 +117,13 @@ func add_item_by_id(id, amount):
 		remaining = _search_and_add(items_found, amount)
 		
 		if typeof(remaining) == TYPE_BOOL:
-			return true
+			return items_found
 	
 	# Check if the inventory is full
 	if is_full():
-		if(debug): print("Inventory full")
-		return null
+		if(debug):
+			print("Inventory full")
+		return
 	
 	if(items_found):
 		_add_remaining_items(remaining, items_found[0])
@@ -92,8 +136,9 @@ func add_item_by_id(id, amount):
 			new_item.set_amount(amount)
 		new_item.set_slot(get_first_empty_slot())
 	else:
-		if(debug): print("Couldn't create the item")
-		return null
+		if(debug):
+			print("Couldn't create the item")
+		return
 	
 	_insert_item(new_item)
 	return new_item
@@ -102,7 +147,7 @@ func add_item_by_id(id, amount):
 # item overflows.
 func add_item(item):
 	if(!item.get("item_id") || !item.get("amount")): return null
-	return add_item_by_id(item["item_id"], item["amount"])
+	return add_item_by_id(item)
 
 # Creates an array of zeros
 static func create_zero_array(length):
@@ -111,14 +156,6 @@ static func create_zero_array(length):
 		temp.append(0)
 	return temp
 
-# When dragging and dropping an item into another item
-# TODO: Surely this won't work pretty well, so it needs some fixing
-func drag_and_drop(item, prev_item):
-	if(item && prev_item):
-		items[item.get_uuid()] = prev_item
-		items[prev_item.get_uuid()] = item
-		return true
-	else: return false
 
 # Defaults to get_empty_slots_array(), DON'T CHANGE
 func get_slots_available():
@@ -364,9 +401,9 @@ func _add_remaining_items(remaining, sample_item):
 		return null
 	
 	# Check if there are items remaining
-	if typeof(remaining) == TYPE_INT && remaining >= 1 && \
+	if(typeof(remaining) == TYPE_INT && remaining >= 1 && \
 			sample_item.has_method("get_as_dict") && \
-			Item.has_method("create_item"):
+			Item.has_method("create_item")):
 		# Insert the item in a new slot
 		var item_info = sample_item.get_as_dict()
 		item_info["amount"] = remaining # Set the remaining as the amount
@@ -465,6 +502,9 @@ func _search_and_add(items_arr, amount):
 
 ### Size
 func set_size(value:int) -> void:
+	if(self.debug):
+		print("Inventory(script) -> set_size() || set_length(): ")
+	
 	var old_size = self.size
 	size = value
 	
