@@ -6,6 +6,7 @@ var UIUtils = preload("res://godot-libs/libs/utils/ui_utils.gd")
 
 export(int) var length:int = 0
 export(int) var rows:int = 1
+export(int) var ui_rows:int = 4
 
 onready var cm = find_node("CellsManager")
 
@@ -30,24 +31,38 @@ func _ready():
 	print("Cells manager type: ", typeof(cm))
 	
 	# Changing the size and the anchors
+	var background_color = find_node("BackgroundColor")
 	var anchors = UIExtra.center_inventory_anchors({
 			"info": {
+				"columns": 9,
 				"debug": false,
 				"cells_manager": cm,
-				"inventory": find_node("Panel"),
-				"rows": rows,
+				"inventory": background_color,
+				"rows": ui_rows,
 			}
 		})
+	ObjectUtils.set_info($CellsContainer, anchors)
 	
 	# We add a little offset to center it
 	var space = UIExtra.space_between_cells()
 	var h_anchor_space = UIUtils.get_x_pixel_percentage(space)
 	var v_anchor_space = UIUtils.get_y_pixel_percentage(space)
 	var sc = find_node("ScrollContainer")
-	sc.anchor_top += v_anchor_space * 1.6
-	sc.anchor_right += h_anchor_space * 2
-	sc.anchor_bottom += v_anchor_space * 1.6
-	sc.anchor_left += h_anchor_space * 2
+	if(ui_rows >= rows):
+		sc.anchor_top += v_anchor_space * 1.6
+		sc.anchor_right += h_anchor_space * 2
+		sc.anchor_bottom += v_anchor_space * 1.6
+		sc.anchor_left += h_anchor_space * 2
+	elif(ui_rows < rows):
+		sc.anchor_top += v_anchor_space * 2
+		sc.anchor_right += h_anchor_space * 2
+		sc.anchor_bottom += v_anchor_space * 2
+		sc.anchor_left += h_anchor_space * 2
+		
+		background_color.anchor_right += h_anchor_space * 2
+		background_color.anchor_bottom += v_anchor_space * 1.6
+		
+		
 	print("Horizontal anchor space: ", h_anchor_space)
 	print("Vertical anchor space: ", v_anchor_space)
 	

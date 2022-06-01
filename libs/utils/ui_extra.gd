@@ -6,10 +6,9 @@ static func space_between_cells():
 	
 	# Variables
 	# Space between cells in pixels
-	# Here, 0.01 is equal to 1%
-	# Therefore, the result will be 1% of the screen width
+	# 0.01 is equal to 1%
 	var space_between_cells = reliable_viewport.x \
-			* 0.01
+			* 0.005
 	
 	return space_between_cells
 
@@ -261,22 +260,19 @@ static func center_inventory_anchors(options:Dictionary):
 	var cm = info["cells_manager"]
 	var cells_min_size = cm["cells_min_size"]
 	var debug = info["debug"] if info.has("debug") else false
+	var length = cm["length"]
 	var offset_x = info["offset_x"] if info.has("offset_x") else 0
 	var offset_y = info["offset_y"] if info.has("offset_y") else 0
-	var rows = info["rows"]
 	
-	var length = cm["length"]
-	var override_length = info["override_length"] \
-			if info.has("override_length") else null
-	if(override_length != null):
-		length = override_length
+	var rows = info["rows"]
+	var columns = info["columns"] if info.has("columns") else length / rows
 	
 	if(debug):
 		print("UIExtra -> set_hotbar_panel_anchors(options:Dictionary):")
-		print("Columns: ", length / rows)
+		print("Columns: ", columns)
 		print("Rows: ", rows)
 	
-	var remaining_width = remaining_width(cells_min_size, length / rows,
+	var remaining_width = remaining_width(cells_min_size, columns,
 			debug)
 	var remaining_height = remaining_height(cells_min_size, rows,
 			debug)
@@ -310,7 +306,7 @@ static func center_inventory_anchors(options:Dictionary):
 	ObjectUtils.set_info(inventory, result)
 	
 	# Update rect min size
-	var inventory_width = inventory_width(cells_min_size, length / rows)
+	var inventory_width = inventory_width(cells_min_size, columns)
 	var inventory_height = inventory_height(cells_min_size, rows)
 	var inventory_size = Vector2(inventory_width, inventory_height)
 	
