@@ -129,8 +129,7 @@ static func set_cells_position(options:Dictionary):
 	# Here, 0.01 is equal to 1%
 	# Therefore, the result will be 1% of the screen width
 	var reliable_viewport = UIUtils.get_reliable_viewport()
-	var space_between_cells = reliable_viewport.x \
-			* 0.01
+	var space_between_cells = space_between_cells()
 	var cells_min_size = cm.cells_min_size
 	
 	var position_x = space_between_cells
@@ -262,9 +261,15 @@ static func center_inventory_anchors(options:Dictionary):
 	var cm = info["cells_manager"]
 	var cells_min_size = cm["cells_min_size"]
 	var debug = info["debug"] if info.has("debug") else false
-	var length = cm["length"]
-	var reliable_viewport = UIUtils.get_reliable_viewport()
+	var offset_x = info["offset_x"] if info.has("offset_x") else 0
+	var offset_y = info["offset_y"] if info.has("offset_y") else 0
 	var rows = info["rows"]
+	
+	var length = cm["length"]
+	var override_length = info["override_length"] \
+			if info.has("override_length") else null
+	if(override_length != null):
+		length = override_length
 	
 	if(debug):
 		print("UIExtra -> set_hotbar_panel_anchors(options:Dictionary):")
@@ -275,12 +280,16 @@ static func center_inventory_anchors(options:Dictionary):
 			debug)
 	var remaining_height = remaining_height(cells_min_size, rows,
 			debug)
-	var horizontal_space = UIUtils.get_x_pixel_percentage(remaining_width / 2)
-	var vertical_space = UIUtils.get_y_pixel_percentage(remaining_height / 2)
-	anchor_top = vertical_space
-	anchor_right = 1 - horizontal_space
-	anchor_bottom = 1 - vertical_space
-	anchor_left = horizontal_space
+	var horizontal_space = UIUtils.get_x_pixel_percentage(
+			(remaining_width) / 2)
+	var vertical_space = UIUtils.get_y_pixel_percentage(
+			(remaining_height) / 2)
+	var horizontal_offset_space = UIUtils.get_x_pixel_percentage(offset_x)
+	var vertical_offset_space = UIUtils.get_x_pixel_percentage(offset_y)
+	anchor_top = vertical_space + vertical_offset_space
+	anchor_right = 1 - (horizontal_space + horizontal_offset_space)
+	anchor_bottom = 1 - (vertical_space + vertical_offset_space)
+	anchor_left = horizontal_space + horizontal_offset_space
 	
 	if(debug):
 		print("Result: ")

@@ -1,12 +1,13 @@
 extends Control
 
-var UIExtra = preload("res://godot-libs/libs/utils/ui_extra.gd")
 var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
+var UIExtra = preload("res://godot-libs/libs/utils/ui_extra.gd")
+var UIUtils = preload("res://godot-libs/libs/utils/ui_utils.gd")
 
 export(int) var length:int = 0
 export(int) var rows:int = 1
 
-onready var cm = $Panel/ScrollContainer/CellsManager
+onready var cm = find_node("CellsManager")
 
 var debug = true
 
@@ -20,7 +21,7 @@ func _ready():
 	ObjectUtils.set_info(
 		cm,
 		{
-			"debug": false,
+			"debug": debug,
 			"length": length,
 		})
 	print("Restoring focus: ")
@@ -33,12 +34,27 @@ func _ready():
 			"info": {
 				"debug": false,
 				"cells_manager": cm,
-				"inventory": self,
+				"inventory": find_node("Panel"),
 				"rows": rows,
 			}
 		})
+	
+	# We add a little offset to center it
+	var space = UIExtra.space_between_cells()
+	var h_anchor_space = UIUtils.get_x_pixel_percentage(space)
+	var v_anchor_space = UIUtils.get_y_pixel_percentage(space)
+	var sc = find_node("ScrollContainer")
+	sc.anchor_top += v_anchor_space * 1.6
+	sc.anchor_right += h_anchor_space * 2
+	sc.anchor_bottom += v_anchor_space * 1.6
+	sc.anchor_left += h_anchor_space * 2
+	print("Horizontal anchor space: ", h_anchor_space)
+	print("Vertical anchor space: ", v_anchor_space)
+	
 	cm.update_cells_size()
-#
+	
+	cm.add_constant_override("hseparation", space)
+	cm.add_constant_override("vseparation", space)
 #	UIExtra.set_cells_position({
 #		"info": {
 #			"cells": cm.cells,

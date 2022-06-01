@@ -9,13 +9,15 @@ anchor_bottom = 1.0
 script = ExtResource( 1 )
 
 [node name="Panel" type="Panel" parent="."]
-self_modulate = Color( 1, 1, 1, 0.572549 )
+self_modulate = Color( 1, 1, 1, 0.470588 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Panel"]
-margin_right = 12.0
-margin_bottom = 12.0
+anchor_right = 1.0
+anchor_bottom = 1.0
 
-[node name="CellsManager" type="Panel" parent="Panel/ScrollContainer"]
+[node name="CellsManager" type="GridContainer" parent="Panel/ScrollContainer"]
+self_modulate = Color( 1, 1, 1, 0.529412 )
+columns = 9
 script = ExtResource( 2 )
