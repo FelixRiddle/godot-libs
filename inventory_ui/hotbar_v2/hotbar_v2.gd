@@ -5,13 +5,15 @@ var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
 export(int) var length:int = 0
 
-onready var cm = $CellsManager
+onready var cells_manager = $CellsManager \
+		setget set_cells_manager, get_cells_manager
 
 var debug = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("HotbarV2 -> _ready():")
+	var cm = cells_manager
 	cm.can_grab_focus = true
 	cm.set_cell_type(2)
 	print("Length: ", length)
@@ -49,4 +51,10 @@ func _ready():
 
 
 func _input(event):
-	cm.middle_mouse_manager()
+	cells_manager.middle_mouse_manager()
+
+
+func set_cells_manager(value) -> void:
+	cells_manager = value
+func get_cells_manager():
+	return cells_manager

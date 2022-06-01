@@ -222,6 +222,9 @@ func restore_focus() -> void:
 		print("CellsManager -> restore_focus():")
 		print("Prev focused: ", self.prev_focused)
 	
+	if(!can_grab_focus):
+		return
+	
 	if(self.prev_focused < cells.size()):
 		var selected_cell = self.cells[self.prev_focused]
 		

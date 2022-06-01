@@ -15,7 +15,7 @@ var debug = true
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("HotbarV2 -> _ready():")
-	cm.can_grab_focus = true
+	cm.can_grab_focus = false
 	cm.set_cell_type(2)
 	print("Length: ", length)
 	print("Setting length")
@@ -25,8 +25,6 @@ func _ready():
 			"debug": debug,
 			"length": length,
 		})
-	print("Restoring focus: ")
-	cm.restore_focus()
 	print("Cells manager length: ", cm.length)
 	print("Cells manager type: ", typeof(cm))
 	
