@@ -1,5 +1,19 @@
 class_name DictionaryUtils
 
+static func get_as_dict(res, props:Array):
+	var is_object = res is Object
+	if(!is_object):
+		return
+	var dict = {}
+	
+	for prop in props:
+		var e = res.get(prop)
+		if(typeof(e) != TYPE_NIL && res[prop] != null):
+			dict[prop] = res[prop]
+	
+	return dict
+
+
 # dict1 is the provided dictionary
 static func key_type_match(dict1, dict2, key):
 	return dict1.has(key) && \
@@ -45,5 +59,5 @@ static func validate_options(options:Dictionary={
 		# Get outta here
 		return
 	
-	print("[+] Correct information given")
+#	print("[+] Correct information given")
 	return true

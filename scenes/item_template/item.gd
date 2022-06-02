@@ -1,0 +1,30 @@
+extends Node2D
+
+var DictionaryUtils = preload(
+		"res://godot-libs/libs/utils/dictionary_utils.gd")
+
+export(int) var item_amount:int = 1
+export(String) var item_description:String = "Description"
+export(int) var item_id:int = 0
+export(Texture) var item_image
+export(String) var item_name:String = "Item"
+export(String) var player_name:String = "Player"
+
+func _ready():
+	var sprite:Sprite = $Sprite
+	
+	sprite.texture = item_image
+
+
+func _on_PickupArea_body_entered(body):
+	if(body.name == player_name && body.has_method("pick_item")):
+		var properties_dictionary = DictionaryUtils.get_as_dict(
+				self, [
+					"item_amount",
+					"item_description",
+					"item_id",
+					"item_image",
+					"item_name"
+				])
+		
+		body.pick_item(properties_dictionary)

@@ -8,7 +8,7 @@ export(int) var length:int = 0
 onready var cells_manager = $CellsManager \
 		setget set_cells_manager, get_cells_manager
 
-var debug = true
+var debug = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
