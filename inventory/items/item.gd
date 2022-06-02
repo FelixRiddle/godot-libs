@@ -24,7 +24,7 @@ export var item_description = "Sample text" \
 		setget set_id, get_id
 export var item_id = 0 setget set_id, get_id
 # Path to the item image
-export var item_image = "" setget set_item_image, get_item_image
+var item_image = Node.new() setget set_item_image, get_item_image
 export var item_image_path = "" \
 		setget set_item_image_path,get_item_image_path
 export var item_name = "" setget set_name, get_name
@@ -40,32 +40,6 @@ var uuid = uuid_util.v4() setget , get_uuid
 var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
-## Create a new by a given dictionary of stats
-#static func create_item_by_dict(item):
-#	var temp_debug = item["debug"] if(item.has("debug")) else false
-#	if(temp_debug):
-#		print("Item.gd -> create_item_by_dict(item):")
-#
-#	if(item):
-#		# If the path to the Item class doesn't exist
-#		if(!item.get("class_path")):
-#			if(temp_debug):
-#				print("The item provided doesn't have a class_path, item: ",
-#					item)
-#			return null
-#
-#		# Even if the file isn't loaded, the script will continue executing
-#		var ItemClass = load(item["class_path"])
-#
-#		# If the item class couldn't be loaded
-#		if(!ItemClass):
-#			if(temp_debug):
-#				print("Class not found, its path: ", item["class_path"])
-#			return null
-#
-#		return ItemClass.new(item, null)
-
-
 # Drop items
 # item_dict: Result of the method call get_as_dict()
 # amount: Amount of items to drop
@@ -98,86 +72,15 @@ func drop_overflow():
 		return null
 
 
-# Find by id
-#static func find_by_id(id):
-#	var ItemsDatabase = \
-#		load("res://godot-libs/test/items_database/items_database.gd")
-#
-#	# Check if the item exists in the database
-#	if typeof(id) == TYPE_INT:
-#		# Check if the item was already created
-#		var found_item = ItemsDatabase.get_item_by_id(id)
-#
-#		# If the item doesn't exist
-#		if !found_item:
-#			return false
-#		else: # Item does exist
-#			return found_item
-#
-#	# The "id" provided is NOT an integer,
-#	# which means it's not a predefined item
-#	return null
-
-
 # Get item stats as a dictionary v2
-func get_item_stats_as_dictv2() -> Dictionary:
+func get_as_dict() -> Dictionary:
 	# This class item properties
 	var item_props:Array = ["class_id", "class_path", "item_amount",
 		"item_capacity", "item_description", "item_id", "item_name",
 		"item_slot", "item_subtype", "item_type", "overflow", "scene_path"]
 	
-	var dict = DictionaryUtils.get_as_dict(self, item_props)
+	var dict:Dictionary = DictionaryUtils.get_as_dict(self, item_props)
 	return dict
-
-
-# Find item
-#static func find(item):
-#	if(item.get("item_id")):
-#		return find_by_id(item["item_id"])
-#	else:
-#		return null
-
-
-# Set info shorthand
-# Returns the same dictionary
-func set_info(item_dict:Dictionary) -> Dictionary:
-	if(item_dict.get("debug")):
-		self.debug = item_dict["debug"]
-	if(debug):
-		print("Item.gd -> set_info(item):")
-	
-	
-	# TODO: This could be really improved by using a for loop
-	if(item_dict.get("amount")):
-		self.item_amount = item_dict["amount"]
-	if(item_dict.get("capacity")):
-		self.item_capacity = item_dict["capacity"]
-	if(item_dict.get("class_id")):
-		self.class_id = item_dict["class_id"]
-	if(item_dict.get("class_path")):
-		self.class_path = item_dict["class_path"]
-	if(item_dict.get("description")):
-		self.item_description = item_dict["description"]
-	if(item_dict.get("name")):
-		self.item_name = item_dict["name"]
-	if(item_dict.get("scene_path")):
-		self.scene_path = item_dict["scene_path"]
-	if(item_dict.get("slot")):
-		self.item_slot = item_dict["slot"]
-	if(item_dict.get("subtype")):
-		self.item_subtype = item_dict["subtype"]
-	if(item_dict.get("type")):
-		self.item_type = item_dict["type"]
-		
-	# If the value provided is null, default to create a uuid
-	if(item_dict.get("item_id")):
-		self.item_id = item_dict["item_id"]
-	else:
-		if(debug):
-			print("Setting id to uuid")
-		self.item_id = uuid_util.v4()
-	
-	return item_dict
 
 
 ### Amount
@@ -197,7 +100,7 @@ func set_amount(value):
 		# the space available
 		var remaining_items = value - space_available
 		
-		# NOTE: This would calling this same function recursively
+		# NOTE: This would be recursive
 		#self.item_amount = item_capacity
 		# Fill it up
 		item_amount = item_capacity

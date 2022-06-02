@@ -1,6 +1,16 @@
 class_name ObjectUtils
 
 # set info
+static func set_info_unsafe(object, data:Dictionary):
+	for prop in data.keys():
+		# Check if the key exists
+		if(object.get(prop) != null):
+			object[prop] = data[prop]
+	
+	return object
+
+
+# set info
 static func set_info(object, data={"_": { "empty": true }}):
 	if(!(object is Object) || object == null):
 		return

@@ -102,33 +102,6 @@ func _search_and_add(items_arr, amount):
 	return amount
 
 
-# Note: I consider functions that start with a "_" private functions
-# Add remaining items
-#func _add_remaining_items(remaining, sample_item):
-#	if(debug):
-#		print("Inventory.gd -> _add_remaining_items(remaining, sample_item):")
-#		print("Remaining items to add: ", remaining)
-#
-#	# If there is no sample_item
-#	if(!sample_item):
-#		return null
-#
-#	# Check if there are items remaining
-#	if(typeof(remaining) == TYPE_INT && remaining >= 1 && \
-#			sample_item.has_method("get_as_dict") && \
-#			Item.has_method("create_item")):
-#		# Insert the item in a new slot
-#		var item_info = sample_item.get_as_dict()
-#		item_info["amount"] = remaining # Set the remaining as the amount
-#		var new_item = Item.create_item(item_info)
-#
-#		# Insert the new item
-#		self.items[new_item["uuid"]] = new_item
-#		return new_item
-#
-#	return null
-
-
 # Add item by its id
 # This functions adds an item by searching its id on the ItemsDatabase
 # class, if it isn't found it defaults to create a new Item with that id and
@@ -198,14 +171,9 @@ func add_item_by_id(item_data:Dictionary={
 			print("Inventory full")
 		return
 	
-#	if(items_found):
-#		var added_item = _add_remaining_items(info["amount"], items_found[0])
-#		if(debug && !added_item):
-#			print("The item couldn't be added!")
-	
 	# Create item
 	var new_item = Item.new()
-	ObjectUtils.set_info(new_item, info)
+	ObjectUtils.set_info_unsafe(new_item, info)
 	new_item.set_slot(get_first_empty_slot())
 	
 	_insert_item(new_item)
@@ -394,12 +362,16 @@ func get_used_slots_array():
 
 # Check if the inventory is full
 func is_full():
-	print("Inventory.gd -> is_full():")
+	if(self.debug):
+		print("Inventory.gd -> is_full():")
+	
 	# Get available slots
 	var slots_available = get_slots_available()
 	# If the slots_available array is empty, it's the same as null
-	if(slots_available): return false
-	else: return true
+	if(slots_available):
+		return false
+	else:
+		return true
 
 
 # Print items on the console
@@ -472,30 +444,6 @@ func remove_item_by_slot(value):
 		
 		if(item.has_method("get_slot") && item.get_slot() == value):
 			return remove_item_by_uuid(i)
-
-
-# Create instance of Item with the item stats
-#func _create_item_by_id(id):
-#	var new_item = Item.new()
-#	new_item["debug"] = self.debug
-#
-#	if(debug):
-#		print("Inventory.gd -> _create_item_by_id(id): ")
-#
-#	# If the item is in the ItemDatabase(list of items)
-#	var item_found = new_item.find_by_id(id)
-#
-#	if(item_found):
-#		# Add the amount
-#		if(debug): print("Item found: ", item_found)
-#		item_found["debug"] = self.debug
-#
-#		new_item = new_item.create_item_by_dict(item_found)
-#		return new_item
-#	elif(debug):
-#		print("Item not found, item: ", item_found)
-#
-#	return null
 
 
 # Insert an item to the items dictionary(the actual inventory)

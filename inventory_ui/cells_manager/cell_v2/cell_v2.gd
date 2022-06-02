@@ -15,6 +15,7 @@ class_name CellV2
 
 signal updated
 
+var debug = false
 var updated:bool = false setget set_updated, get_updated
 
 func _ready():
@@ -26,6 +27,8 @@ func _ready():
 
 # Set and get amount item label
 func set_item_amount(value:int) -> void:
+	if(debug):
+		print("CellV2 -> set_item_amount(value):")
 	if(value > 1):
 		var label:Label = get_amount_label()
 		label.text = String(value)
@@ -40,6 +43,9 @@ func get_amount_label():
 
 # setget item_image
 func set_item_image(value) -> void:
+	if(debug):
+		print("CellV2 -> set_item_image(value):")
+	
 	if(typeof(value) == TYPE_STRING):
 		value = load(value)
 	
@@ -53,13 +59,6 @@ func get_item_image():
 
 func get_item_image_node():
 	return $ItemImage
-
-
-#func set_rect_size(value:Vector2) -> void:
-#	print(" ------- Successfully overriden")
-#	rect_size = value
-#func get_rect_size() -> Vector2:
-	return rect_size
 
 
 # setget updated

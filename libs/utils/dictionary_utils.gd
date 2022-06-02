@@ -15,6 +15,14 @@ static func get_as_dict(obj, props:Array):
 	return dict
 
 
+# Join two different dictioanries
+static func join(dict1:Dictionary, dict2:Dictionary) -> Dictionary:
+	# Join to dict1, if necessary modify this later
+	for key in dict2.keys():
+		dict1[key] = dict2[key]
+	return dict1
+
+
 # dict1 is the provided dictionary
 static func key_type_match(dict1, dict2, key):
 	return dict1.has(key) && \

@@ -36,5 +36,6 @@ func _on_PickupArea_body_entered(body):
 					"item_image",
 					"item_name"
 				])
+		properties_dictionary["item_image"] = item_image.duplicate()
 		body.pick_item(properties_dictionary)
 		queue_free()

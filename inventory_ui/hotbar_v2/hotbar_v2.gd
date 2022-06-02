@@ -70,7 +70,16 @@ func get_cells_manager():
 func get_inventory_script():
 	return cells_manager.inventory
 func add_item_by_id(dict:Dictionary):
-	return cells_manager.inventory.add_item_by_id({ "info": dict })
+	if(debug):
+		print("Hotbarv2 -> add_item_by_id(dict:Dictionary):")
+	
+	var item_added = cells_manager \
+			.inventory \
+			.add_item_by_id({
+				"info": dict
+			})
+	
+	return item_added
 
 func set_length(value:int) -> void:
 	length = value
