@@ -3,7 +3,7 @@ extends Control
 var UIExtra = preload("res://godot-libs/libs/utils/ui_extra.gd")
 var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
-export(int) var length:int = 0
+export(int) var length:int = 0 setget set_length, get_length
 
 onready var cells_manager = $CellsManager \
 		setget set_cells_manager, get_cells_manager
@@ -71,3 +71,12 @@ func get_inventory_script():
 	return cells_manager.inventory
 func add_item_by_id(dict:Dictionary):
 	return cells_manager.inventory.add_item_by_id({ "info": dict })
+
+func set_length(value:int) -> void:
+	length = value
+	
+	# Update cells_manager length
+	if(cells_manager):
+		cells_manager["length"] = value
+func get_length() -> int:
+	return length

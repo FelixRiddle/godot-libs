@@ -37,3 +37,4 @@ func _on_PickupArea_body_entered(body):
 					"item_name"
 				])
 		body.pick_item(properties_dictionary)
+		queue_free()

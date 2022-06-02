@@ -379,10 +379,9 @@ func set_length(value:int) -> void:
 		cell.updated = false
 	
 	# Update inventory size
-	inventory.size = length
-	
 	var old_length:int = length
 	length = value
+	inventory.size = value
 	emit_signal("size_changed", old_length, length)
 	
 	if(debug):

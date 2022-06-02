@@ -180,4 +180,5 @@ static func get_item_classes_and_id():
 
 # Get an item by id(key)
 static func get_item_by_id(id):
-	return get_items()[id]
+	var items = get_items()
+	return items[id] if items.has(id) else null

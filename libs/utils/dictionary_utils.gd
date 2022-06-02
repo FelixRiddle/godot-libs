@@ -1,15 +1,16 @@
 class_name DictionaryUtils
 
-static func get_as_dict(res, props:Array):
-	var is_object = res is Object
+static func get_as_dict(obj, props:Array):
+	var is_object = obj is Object
 	if(!is_object):
 		return
 	var dict = {}
 	
 	for prop in props:
-		var e = res.get(prop)
-		if(typeof(e) != TYPE_NIL && res[prop] != null):
-			dict[prop] = res[prop]
+		var e = obj.get(prop)
+#		if(typeof(e) != TYPE_NIL && obj[prop] != null):
+		if(typeof(e) != TYPE_NIL):
+			dict[prop] = obj[prop]
 	
 	return dict
 

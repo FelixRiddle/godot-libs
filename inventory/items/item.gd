@@ -1,7 +1,9 @@
 class_name Item
 
 # Scripts
-var uuid_util = load("res://godot-libs/libs/uuid.gd")
+var DicitonaryUtils = preload(
+	"res://godot-libs/libs/utils/dictionary_utils.gd")
+var uuid_util = preload("res://godot-libs/libs/uuid.gd")
 
 # Signals
 signal slot_changed
@@ -30,6 +32,7 @@ export var item_name = "" setget set_name, get_name
 export var item_slot = 0 setget set_slot, get_slot
 export var item_subtype = "" setget set_subtype, get_subtype
 export var item_type = "" setget set_type, get_type
+var item_stats:Dictionary = { } setget set_item_stats, get_item_stats
 
 # Private fields
 # A uuid is practically unique almost always
@@ -37,43 +40,30 @@ var uuid = uuid_util.v4() setget , get_uuid
 var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
-## Add items
-## IDK what this is, but it's very wrong.
-## TODO: Fix this sh*t
-#func add(amount:int) -> bool:
-#	if(self.item_capacity >= amount):
-#		return false
-#	elif(self.item_capacity < amount):
-#		# Add up to the item_capacity
-#		return false
-#	item_amount += amount
-#	return true
-
-
-# Create a new by a given dictionary of stats
-static func create_item_by_dict(item):
-	var temp_debug = item.get("debug") && item["debug"]
-	if(temp_debug):
-		print("Item.gd -> create_item_by_dict(item):")
-	
-	if(item):
-		# If the path to the Item class doesn't exist
-		if(!item.get("class_path")):
-			if(temp_debug):
-				print("The item provided doesn't have a class_path, item: ",
-					item)
-			return null
-		
-		# Even if the file isn't loaded, the script will continue executing
-		var ItemClass = load(item["class_path"])
-		
-		# If the item class couldn't be loaded
-		if(!ItemClass):
-			if(temp_debug):
-				print("Class not found, its path: ", item["class_path"])
-			return null
-		
-		return ItemClass.new(item, null)
+## Create a new by a given dictionary of stats
+#static func create_item_by_dict(item):
+#	var temp_debug = item["debug"] if(item.has("debug")) else false
+#	if(temp_debug):
+#		print("Item.gd -> create_item_by_dict(item):")
+#
+#	if(item):
+#		# If the path to the Item class doesn't exist
+#		if(!item.get("class_path")):
+#			if(temp_debug):
+#				print("The item provided doesn't have a class_path, item: ",
+#					item)
+#			return null
+#
+#		# Even if the file isn't loaded, the script will continue executing
+#		var ItemClass = load(item["class_path"])
+#
+#		# If the item class couldn't be loaded
+#		if(!ItemClass):
+#			if(temp_debug):
+#				print("Class not found, its path: ", item["class_path"])
+#			return null
+#
+#		return ItemClass.new(item, null)
 
 
 # Drop items
@@ -109,86 +99,43 @@ func drop_overflow():
 
 
 # Find by id
-static func find_by_id(id):
-	var ItemsDatabase = \
-		load("res://godot-libs/test/items_database/items_database.gd")
-	
-	# Check if the item exists in the database
-	if typeof(id) == TYPE_INT:
-		# Check if the item was already created
-		var found_item = ItemsDatabase.get_item_by_id(id)
-		
-		# If the item doesn't exist
-		if !found_item:
-			return false
-		else: # Item does exist
-			return found_item
-	
-	# The "id" provided is NOT an integer,
-	# which means it's not a predefined item
-	return null
-
-
-# Get as dict, overridable
-func get_as_dict():
-	return _get_item_stats_as_dict()
-
-
-# Get item stats as dictionary
-func _get_item_stats_as_dict() -> Dictionary:
-	
-	var result:Dictionary = {}
-	
-	# TODO: This could be really improved by using a for loop
-	#if(get("class_id")):
-	result["class_id"] = self.class_id
-	#if(get("class_path")):
-	result["class_path"] = self.class_path
-	#if(get("item_amount")):
-	result["amount"] = self.item_amount
-	#if(get("item_capacity")):
-	result["capacity"] = self.item_capacity
-	#if(get("item_description")):
-	result["description"] = self.item_description
-	#if(get("item_id")):
-	result["item_id"] = self.item_id
-	#if(get("item_name")):
-	result["name"] = self.item_name
-	#if(get("item_slot")):
-	result["slot"] = self.item_slot
-	#if(get("item_subtype")):
-	result["subtype"] = self.item_subtype
-	#if(get("item_type")):
-	result["type"] = self.item_type
-	#if(get("scene_path")):
-	result["scene"] = self.scene_path
-	
-	return result
+#static func find_by_id(id):
+#	var ItemsDatabase = \
+#		load("res://godot-libs/test/items_database/items_database.gd")
+#
+#	# Check if the item exists in the database
+#	if typeof(id) == TYPE_INT:
+#		# Check if the item was already created
+#		var found_item = ItemsDatabase.get_item_by_id(id)
+#
+#		# If the item doesn't exist
+#		if !found_item:
+#			return false
+#		else: # Item does exist
+#			return found_item
+#
+#	# The "id" provided is NOT an integer,
+#	# which means it's not a predefined item
+#	return null
 
 
 # Get item stats as a dictionary v2
 func get_item_stats_as_dictv2() -> Dictionary:
-	var dict:Dictionary = {}
-	
 	# This class item properties
 	var item_props:Array = ["class_id", "class_path", "item_amount",
 		"item_capacity", "item_description", "item_id", "item_name",
 		"item_slot", "item_subtype", "item_type", "overflow", "scene_path"]
 	
-	# Insert properties into a dictionary
-	for prop_name in item_props:
-		if(get(prop_name)):
-			dict[prop_name] = self[prop_name]
-	
+	var dict = DictionaryUtils.get_as_dict(self, item_props)
 	return dict
 
 
 # Find item
-static func find(item):
-	if(item.get("item_id")):
-		return find_by_id(item["item_id"])
-	else:
-		return null
+#static func find(item):
+#	if(item.get("item_id")):
+#		return find_by_id(item["item_id"])
+#	else:
+#		return null
 
 
 # Set info shorthand
@@ -337,6 +284,13 @@ func set_item_image_path(value:String) -> void:
 	item_image_path = value
 func get_item_image_path() -> String:
 	return item_image_path
+
+
+# setget item_stats
+func set_item_stats(value:Dictionary) -> void:
+	item_stats = value
+func get_item_stats() -> Dictionary:
+	return item_stats
 
 
 ### Item name
