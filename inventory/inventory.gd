@@ -81,8 +81,8 @@ func add_item_by_id(item_data:Dictionary={
 	if(debug):
 		print("Inventory.gd -> add_item_by_id(id, amount):")
 	
-	var id
 	var amount
+	var id
 	
 	if(item_data.has("_") && item_data.has("default_dictionary") &&
 			item_data["default_dictionary"]):
@@ -90,18 +90,26 @@ func add_item_by_id(item_data:Dictionary={
 		return
 	elif(item_data.has("info")):
 		var required_data:Dictionary = {
-			"id": 1,
-			"amount": 1,
+			"item_id": 1,
+			"item_amount": 1,
 		}
+		var info = item_data["info"]
+		
 		var validated = DictionaryUtils.validate_options(
-			item_data["info"],
+			{ "info": info },
 			required_data)
 		
 		if(validated):
-			var info = item_data["info"]
-			id = info["id"]
-			amount = info["amount"]
+			id = info["item_id"]
+			amount = info["item_amount"]
+		else:
+			if(self.debug):
+				print("Inventory(Script) -> add_item_by_id():")
+				print("At least id and amount are required.")
+				print("Data given: ", item_data)
 			
+			# Get outta here
+			return
 	else:
 		# Get outta here
 		return

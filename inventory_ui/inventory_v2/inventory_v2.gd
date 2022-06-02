@@ -36,8 +36,7 @@ func _ready():
 		print("Cells manager type: ", typeof(cm))
 	
 	# Changing the size and the anchors
-	var background_color = find_node("BackgroundColor")
-	var anchors = UIExtra.center_inventory_anchors({
+	UIExtra.center_inventory_anchors({
 			"info": {
 				"columns": 9,
 				"debug": false,
@@ -76,14 +75,7 @@ func _ready():
 	cm.add_constant_override("vseparation", space)
 
 
-func _input(event):
-	cells_manager.middle_mouse_manager()
-
-
 func get_inventory_script():
 	return cells_manager.inventory
-func add_item_by_id(item_id, amount):
-	return cells_manager.inventory.add_item_by_id({
-		"id": item_id,
-		"amount": amount,
-	})
+func add_item_by_id(dict:Dictionary):
+	return cells_manager.inventory.add_item_by_id({ "info": dict })

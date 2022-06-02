@@ -8,6 +8,7 @@ radius = 38.2099
 
 [node name="Item" type="Node2D"]
 script = ExtResource( 1 )
+item_image = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 2 )

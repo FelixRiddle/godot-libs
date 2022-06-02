@@ -69,8 +69,5 @@ func get_cells_manager():
 
 func get_inventory_script():
 	return cells_manager.inventory
-func add_item_by_id(item_id, amount):
-	return cells_manager.inventory.add_item_by_id({
-		"id": item_id,
-		"amount": amount,
-	})
+func add_item_by_id(dict:Dictionary):
+	return cells_manager.inventory.add_item_by_id({ "info": dict })
