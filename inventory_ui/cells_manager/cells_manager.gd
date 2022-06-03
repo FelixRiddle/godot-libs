@@ -441,8 +441,6 @@ func _on_inventory_inventory_changed(old_inv:Dictionary = {},
 	for pos in new_inv_ref:
 		var item = new_inv_ref[pos]
 		var cell = cells[item["item_slot"]]
-		var item_image = item["item_image"]
-		var item_amount = item["item_amount"]
+		print("Item slot: ", item["item_slot"])
 		
-		cell.set_item_image(item_image)
-		cell.set_item_amount(item_amount)
+		cell.set_item(item)

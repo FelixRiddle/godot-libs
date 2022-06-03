@@ -40,24 +40,6 @@ var uuid = uuid_util.v4() setget , get_uuid
 var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
-# Drop items
-# item_dict: Result of the method call get_as_dict()
-# amount: Amount of items to drop
-func drop(item_dict, amount):
-	if(typeof(amount) == TYPE_INT):
-		# Check if there are enough items
-		if(amount >= amount):
-			item_dict["amount"] = amount
-			return item_dict
-		else:
-			print("There are not enough items to drop")
-	else:
-		print("Item.gd -> drop(item_dict, amount): Amount it's not an " + \
-			"integer.")
-	
-	return null
-
-
 # Drop overflow
 func drop_overflow():
 	if(debug):
@@ -218,16 +200,12 @@ func get_scene_path():
 
 
 ### Item slot
-func set_slot(value):
-	# Check if the provided value is an integer
-	if typeof(value) == TYPE_INT:
-		item_slot = value
-		
-		emit_signal("slot_changed")
-	else:
-		print("Item class -> set_slot(value): Expected type int, provided: %s"
-			% typeof(value))
-func get_slot():
+func set_slot(value:int) -> void:
+	print("Set slot with value: ", value)
+	item_slot = value
+	
+	emit_signal("slot_changed")
+func get_slot() -> int:
 	return item_slot
 
 

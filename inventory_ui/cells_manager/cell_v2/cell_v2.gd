@@ -25,6 +25,11 @@ func _ready():
 		#print("Min rect size changed, new min_rect_size: ", rect_min_size)
 
 
+func set_item(item):
+	set_item_amount(item["item_amount"])
+	set_item_image(item["item_image"])
+	update_item_image_size()
+
 # Set and get amount item label
 func set_item_amount(value:int) -> void:
 	if(debug):
@@ -69,6 +74,12 @@ func set_updated(value:bool) -> void:
 		emit_signal("updated")
 func get_updated() -> bool:
 	return updated
+
+
+func update_item_image_size():
+	var item_image = $ItemImage
+	item_image.rect_min_size = self.rect_min_size
+	item_image.rect_size = self.rect_size
 
 
 # Notifications

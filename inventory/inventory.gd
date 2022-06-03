@@ -209,13 +209,15 @@ func get_empty_slots_array():
 	
 	var result_array = []
 	if(!self.items):
-		for i in range(1, self.size + 1):
+#		for i in range(1, self.size + 1):
+		for i in range(0, self.size):
 			result_array.push_back(i)
 		return result_array
 	else:
 		var occupied_slots = get_used_slots_array()
 		
-		for i in range(1, self.size + 1):
+#		for i in range(1, self.size + 1):
+		for i in range(0, self.size):
 			var isnt_occupied = true
 			
 			# Check if it isn't occupied
@@ -234,9 +236,10 @@ func get_first_empty_slot():
 	if(debug):
 		print("Inventory.gd -> get_first_empty_slot():")
 	var empty_slots = get_empty_slots()
-	if(empty_slots):
+	if(empty_slots != null):
 		return empty_slots[0]
-	else: return null
+	else:
+		return 0
 
 
 # Get every item that has the provided id
@@ -340,8 +343,8 @@ func get_used_slots():
 
 # Get used slots array
 func get_used_slots_array():
-	#if(debug):
-	#	print("Inventory.gd -> get_used_slots_array():")
+	if(self.debug):
+		print("Inventory.gd -> get_used_slots_array():")
 	
 	var result = []
 	if(!self.items):
@@ -352,11 +355,8 @@ func get_used_slots_array():
 		# Set the current item in a temporal variable
 		var curr_item = self.items[i]
 		
-		# Check if the method exists(because if it doesn't, it would throw
-		# an error)
-		if(curr_item.has_method("get_slot")):
-			# Push at the end
-			result.push_back(curr_item.get_slot())
+		# Push at the end
+		result.push_back(curr_item.get_slot())
 	return result
 
 
@@ -393,19 +393,17 @@ func print_items_as_dict():
 # Print items name as an array
 func print_items_name_array():
 	if(debug):
-		print("Inventory.gd -> print_items_name_as_an_array():")
+		print("Inventory.gd -> print_items_name_array():")
 	
-	var zero_array = create_zero_array(size + 1)
+	var zero_array = create_zero_array(size)
 	
-	for i in self.items.keys():
-		var item = items[i]
+	for key in self.items.keys():
+		var item = items[key]
 		
 		if(typeof(item) == TYPE_OBJECT && item.has_method("get_slot")) && \
 				item.has_method("get_name"):
 			zero_array[item.get_slot()] = item.get_name()
 	
-	# Because items slots go from 1-10
-	zero_array.pop_front()
 	print(zero_array)
 	return zero_array
 
