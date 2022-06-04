@@ -15,7 +15,7 @@ class_name CellV2
 
 signal updated
 
-var debug = false
+var debug:bool = false
 var updated:bool = false setget set_updated, get_updated
 
 func _ready():
@@ -78,8 +78,12 @@ func get_updated() -> bool:
 
 func update_item_image_size():
 	var item_image = $ItemImage
-	item_image.rect_min_size = self.rect_min_size
-	item_image.rect_size = self.rect_size
+	
+	var space = UIExtra.space_between_cells()
+	var ms = self.rect_min_size
+	var new_size = Vector2(ms.x - space, ms.y - space)
+	item_image.rect_min_size = new_size
+	item_image.rect_size = new_size
 
 
 # Notifications

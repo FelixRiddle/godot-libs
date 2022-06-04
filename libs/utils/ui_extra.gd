@@ -1,5 +1,12 @@
 class_name UIExtra
 
+static func extra_small_space():
+	var reliable_viewport = UIUtils.get_reliable_viewport()
+	var space_between_cells = reliable_viewport.x \
+			* 0.001
+	
+	return space_between_cells
+
 # Get space between cells
 static func space_between_cells():
 	var reliable_viewport = UIUtils.get_reliable_viewport()
