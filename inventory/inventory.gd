@@ -15,10 +15,10 @@ var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
 # Signals
 # The new inv is a reference to the actual inventory, remember that
-signal inventory_changed(old_inv, new_inv_ref)
+signal inventory_changed(old_inv, new_inv)
 signal item_removed(item)
 signal item_added(item)
-signal size_changed(old_size, new_size)
+signal slots_changed(old_slots, new_slots)
 
 # Properties
 export(bool) var debug:bool = false setget set_debug, get_debug
@@ -78,43 +78,36 @@ func _search_and_add(items_arr, amount):
 	for i in range(items_arr.size()):
 		var curr_item = items_arr[i]
 		
-		# Check if there is space available
-		if curr_item.has_method("has_space") && curr_item.has_space() && \
-				curr_item.has_method("get_space_available"):
-			
-			var space_available = curr_item.get_space_available()
-			
-			if amount <= space_available:
-				# There is enough space
-				# Add everthing to the item
-				self.items[curr_item.uuid].add(amount)
-				return true
-			else:
-				# There is space, but not enough
-				# Remove some from the amount
-				amount -= space_available
-				# Add the remaining space
-				self.items[curr_item.uuid].add(space_available)
-				
-				# Keep looping to search for more space
+		# The argument here is to make a "deep" copy of the dictionary
+		var old_inventory = self.items.duplicate(true)
+		
+		var prev_amount = amount
+		amount = curr_item.add(amount)
+		
+		# Previous amount is different than the current one
+		if(prev_amount != amount):
+			emit_signal("inventory_changed", old_inventory, self.items)
+		
+		if(amount <= 0):
+			return amount
+		# Keep looping to search for more space
 	
 	# At this point, there is not enough space to fill the items in
 	return amount
 
 
 # Add item by its id
-# This functions adds an item by searching its id on the ItemsDatabase
-# class, if it isn't found it defaults to create a new Item with that id and
-# adds it to the inventory.
-# id: The item id in the database or different id to create a new item
-# amount: The amount to add to the items
-# It can return Item, Array or null
-func add_item_by_id(item_data:Dictionary={
+# Returns state in a string
+# WRONG_DATA: Wrong data given
+# ITEM_ADDED: The item was added onto a slot that wasn't full
+# INVENTORY_FULL: The inventory is full
+# ITEM_INSERTED: The item was inserted into a new slot
+func add_item_by_dictionary(item_data:Dictionary={
 			"_": {
 					"default_dictionary": true,
 				},
 			"info": { }
-			}):
+			}) -> String:
 	if(debug):
 		print("Inventory.gd -> add_item_by_id(id, amount):")
 	
@@ -125,7 +118,7 @@ func add_item_by_id(item_data:Dictionary={
 	if(item_data.has("_") && item_data.has("default_dictionary") &&
 			item_data["default_dictionary"]):
 		# Get outta here
-		return
+		return "WRONG_DATA"
 	elif(item_data.has("info")):
 		var required_data:Dictionary = {
 			"item_id": 1,
@@ -147,44 +140,52 @@ func add_item_by_id(item_data:Dictionary={
 				print("Data given: ", item_data)
 			
 			# Get outta here
-			return
+			return "WRONG_DATA"
 	else:
 		# Get outta here
-		return
+		return "WRONG_DATA"
 	
 	# Check if the item already exists and if it has space available
 	var items_found = get_items_by_id(id)
-	if(debug):
+	if(self.debug):
 		print("Items in inventory with the same id: ", items_found)
 	
 	# If the item already exists
 	if items_found:
 		var remaining = _search_and_add(items_found, amount)
-		if(typeof(remaining) == TYPE_INT && remaining >= 1):
-			info["amount"] = remaining
-		elif(typeof(remaining) == TYPE_BOOL):
-			return items_found
+		
+		if(remaining >= 1):
+			info["item_amount"] = remaining
+			if(self.debug):
+				print("Not enough space to add items, " + \
+						"trying to create a new slot")
+		else:
+			if(self.debug):
+				print("Added items")
+			return "ITEM_ADDED"
 	
 	# Check if the inventory is full
 	if is_full():
-		if(debug):
+		if(self.debug):
 			print("Inventory full")
-		return
+		return "INVENTORY_FULL"
 	
 	# Create item
 	var new_item = Item.new()
+	
+	# We need to set this first, so that when we set the amount for the first
+	# time it won't break
+	new_item["item_capacity"] = info["item_capacity"] \
+			if(info.has("item_capacity")) \
+			else new_item["item_capacity"]
 	ObjectUtils.set_info_unsafe(new_item, info)
 	new_item.set_slot(get_first_empty_slot())
 	
 	_insert_item(new_item)
-	return new_item
-
-
-# In case you want to insert from an item dictionary, for example, when an
-# item overflows.
-func add_item(item):
-	if(!item.get("item_id") || !item.get("amount")): return null
-	return add_item_by_id(item)
+	return "ITEM_INSERTED"
+# Aliases
+func add_item_by_dict(dict):
+	return add_item_by_dictionary(dict)
 
 
 # Creates an array of zeros
@@ -314,18 +315,10 @@ func get_item_by_uuid(value):
 	return items[value]
 
 
-# Other names
-func find_item_in_slot(value):
-	return get_item_in_slot(value)
 # Get item in a slot
-func get_item_in_slot(value):
-	if(debug):
+func get_item_in_slot(value:int):
+	if(self.debug):
 		print("Inventory.gd -> get_item_in_slot(value):")
-	
-	if(typeof(value) != TYPE_INT):
-		if(debug):
-			print("Value is not an integer")
-		return null
 	
 	for i in items.keys():
 		var item = items[i]
@@ -334,6 +327,11 @@ func get_item_in_slot(value):
 			return item
 	
 	return null
+# Aliases
+func find_by_slot(value:int):
+	return get_item_in_slot(value)
+func find_item_in_slot(value:int):
+	return get_item_in_slot(value)
 
 
 # Default to get_used_slots_array, DON't CHANGE
@@ -419,12 +417,18 @@ func remove_item_by_uuid(value):
 		print("Inventory.gd -> remove_item_by_uuid(value):")
 	
 	# Check if the item exists
-	if(items && items.get(value)):
+	if(items && items.has(value)):
 		var item_erased = items[value]
+		
+		# The argument here is to make a "deep" copy of the dictionary
+		var old_inventory = items.duplicate(true)
+		
+		# Dict function to delete a key/value pair
 		items.erase(value)
 		
 		emit_signal("item_removed", item_erased)
-		emit_signal("inventory_changed")
+		emit_signal("inventory_changed", old_inventory, self.items)
+		emit_signal("slots_changed", old_inventory, self.items)
 		
 		return item_erased
 
@@ -441,6 +445,10 @@ func remove_item_by_slot(value):
 		var item = items[i]
 		
 		if(item.has_method("get_slot") && item.get_slot() == value):
+			var old_inventory = items.duplicate(true)
+			emit_signal("inventory_changed", old_inventory, self.items)
+			emit_signal("slots_changed", old_inventory, self.items)
+			
 			return remove_item_by_uuid(i)
 
 
@@ -450,35 +458,23 @@ func _insert_item(item):
 	if(debug):
 		print("Inventory.gd -> _insert_item(item):")
 	
-	# If the item doesn't exist
-	if(!item):
-		if(debug): print("Warning: The item is null: ", item)
-	elif(item.get("uuid")):
-		# The argument here is to make a "deep" copy of the dictionary
-		var old_inventory = items.duplicate(true)
-		
-		# Insert the item in the items dictionary
-		self.items[item["uuid"]] = item
-		
-		emit_signal("item_added", item)
-		emit_signal("inventory_changed", old_inventory, items)
-		return item
-	elif(debug):
-		print("Warning: The new item doesn't have an uuid?, item:")
-		print(item)
+	# The argument here is to make a "deep" copy of the dictionary
+	var old_inventory = items.duplicate(true)
 	
-	return null
+	# Insert the item in the items dictionary
+	self.items[item["uuid"]] = item
+	
+	emit_signal("item_added", item)
+	emit_signal("inventory_changed", old_inventory, self.items)
+	emit_signal("slots_changed", old_inventory, items)
+	return item
 
 
 ### Size
 func set_size(value:int) -> void:
-	if(self.debug):
-		print("Inventory(script) -> set_size() || set_length(): ")
-	
-	var old_size = self.size
+#	if(self.debug):
+#		print("Inventory(script) -> set_size() || set_length(): ")
 	size = value
-	
-	emit_signal("size_changed", old_size, self.size)
 func get_size() -> int:
 	return size
 func set_length(value) -> void:
@@ -502,7 +498,7 @@ func on_Inventory_item_added(item):
 			print("Item overflow: ", item_dict["amount"])
 		
 		# Add item checks for the amount and id keys in the dictionary
-		var result = add_item(item_dict)
+		var result = add_item_by_dict(item_dict)
 		
 		# If result is null, it means that it couldn't be added, in that case
 		# the items should be removed or dropped to the ground

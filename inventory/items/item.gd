@@ -40,6 +40,25 @@ var uuid = uuid_util.v4() setget , get_uuid
 var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
+func add(amount):
+	# Check if there is space available
+	var space_available = get_space_available()
+	
+	if amount <= space_available:
+		# There is enough space
+		# Add everthing to the item
+		self.item_amount += amount
+		return 0
+	else:
+		# There is space, but not enough
+		# Remove some from the amount
+		amount -= space_available
+		# Add the remaining space
+		self.item_amount += space_available
+		
+		# Return the remaining amount
+		return amount
+
 # Drop overflow
 func drop_overflow():
 	if(debug):

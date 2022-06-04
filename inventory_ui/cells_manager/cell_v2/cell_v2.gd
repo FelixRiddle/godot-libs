@@ -2,7 +2,6 @@ extends TextureButton
 class_name CellV2
 
 # Objectives:
-# [] Do an ui that works with the inventory class
 # [] Second click on an item shows some options
 #   [] Lock/Unlock item
 #   [] See details

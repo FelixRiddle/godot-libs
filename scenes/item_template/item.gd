@@ -5,6 +5,7 @@ var DictionaryUtils = preload(
 		"res://godot-libs/libs/utils/dictionary_utils.gd")
 
 export(int) var item_amount:int = 1
+export(int) var item_capacity:int = 999
 export(String, MULTILINE) var item_description:String = "Description"
 export(int) var item_id:int = 0
 export(Texture) var item_image setget set_item_image, get_item_image
@@ -31,6 +32,7 @@ func _on_PickupArea_body_entered(body):
 		var properties_dictionary = DictionaryUtils.get_as_dict(
 				self, [
 					"item_amount",
+					"item_capacity",
 					"item_description",
 					"item_id",
 					"item_image",

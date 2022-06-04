@@ -434,6 +434,7 @@ func get_overflow() -> Array:
 # When there are items added or removed from inventory
 func _on_inventory_inventory_changed(old_inv:Dictionary = {},
 			new_inv_ref:Dictionary = {}) -> void:
+	print("---------Alert: the inventory has changed")
 	if(debug):
 		print("CellsManager -> _on_inventory_inventory_changed:")
 	
