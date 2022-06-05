@@ -73,8 +73,7 @@ func add_item(dict:Dictionary):
 	if(debug):
 		print("Hotbarv2 -> add_item_by_id(dict:Dictionary):")
 	
-	var item_set = cells_manager \
-			.inventory \
+	var item_set = get_inventory_script() \
 			.add_item_by_dict({
 				"info": dict
 			})

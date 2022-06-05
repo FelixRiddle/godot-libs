@@ -65,7 +65,6 @@ func drop_overflow():
 		print("Item.gd -> get_item_overflow(item_dict):")
 	
 	if(overflow > 0):
-		# Insert overflow of this item into the new dictionary
 		var _overflow = overflow
 		overflow = 0
 		return _overflow
@@ -77,8 +76,9 @@ func drop_overflow():
 func get_as_dict() -> Dictionary:
 	# This class item properties
 	var item_props:Array = ["class_id", "class_path", "item_amount",
-		"item_capacity", "item_description", "item_id", "item_name",
-		"item_slot", "item_subtype", "item_type", "overflow", "scene_path"]
+		"item_capacity", "item_description", "item_id", "item_image",
+		"item_name", "item_slot", "item_subtype", "item_type", "overflow",
+		"scene_path"]
 	
 	var dict:Dictionary = DictionaryUtils.get_as_dict(self, item_props)
 	return dict
@@ -125,6 +125,10 @@ func set_capacity(value):
 	item_capacity = value
 func get_capacity():
 	return item_capacity
+
+
+func has_overflow():
+	return self.overflow > 0
 
 
 # Check if the item has space
@@ -220,7 +224,6 @@ func get_scene_path():
 
 ### Item slot
 func set_slot(value:int) -> void:
-	print("Set slot with value: ", value)
 	item_slot = value
 	
 	emit_signal("slot_changed")

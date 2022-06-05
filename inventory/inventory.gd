@@ -488,20 +488,27 @@ func on_Inventory_item_added(item):
 		print("Received item in signal: ", item)
 	
 	# Check if the item exists and if it has the methods needed
-	if(item && item.has_method("drop_overflow") && \
-			item.has_method("get_as_dict")):
+	if(item && item.has_overflow()):
 		# Overflow management
 		# First try to add in the inventory
-		var item_dict = item.get_as_dict()
-		item_dict["amount"] = item.drop_overflow()
-		if(debug):
-			print("Item overflow: ", item_dict["amount"])
+		var item_dict = {}
+		
+		# First we drop the overflow and then we get the item dictionary, or
+		# else, we would create a new item with overflow, and this would loop
+		# forever
+		var item_overflow = item.drop_overflow()
+		# We also need to duplicate the item image, in case it changes
+		var item_image = item["item_image"].duplicate()
+		item_dict = item.get_as_dict()
+		
+		# Set the new item amount to the overflow of the previous item
+		item_dict["item_amount"] = item_overflow
+		item_dict["item_image"] = item_image
+		if(self.debug):
+			print("Item dict: ", item_dict)
+			print("Item overflow: ", item_dict["item_amount"])
 		
 		# Add item checks for the amount and id keys in the dictionary
-		var result = add_item_by_dict(item_dict)
-		
-		# If result is null, it means that it couldn't be added, in that case
-		# the items should be removed or dropped to the ground
-		if(result):
-			if(debug):
-				print("Overflow added")
+		var state = add_item_by_dict({ "info": item_dict })
+		if(self.debug):
+			print("State of add overflow operation: ", state)
