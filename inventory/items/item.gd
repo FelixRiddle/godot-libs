@@ -40,17 +40,25 @@ var uuid = uuid_util.v4() setget , get_uuid
 var overflow = 0 setget set_overflow, get_overflow
 
 ### Functions/Methods ###
-func add(amount):
+# The same as set_amount, except that instead of setting overflow
+# returns the remaining items
+func add(amount:int) -> int:
+	if(self.debug):
+		print("Item(Script) -> add(amount): ")
 	# Check if there is space available
 	var space_available = get_space_available()
 	
-	if amount <= space_available:
+	# Has space?
+	if(!has_space()):
+		if(self.debug):
+			print(self.item_name, " doesn't have enough space.")
+		return amount
+	elif(amount <= space_available): # There is enough space
 		# There is enough space
 		# Add everthing to the item
 		self.item_amount += amount
 		return 0
-	else:
-		# There is space, but not enough
+	else: # There is space, but not enough
 		# Remove some from the amount
 		amount -= space_available
 		# Add the remaining space
@@ -90,25 +98,30 @@ func set_amount(value):
 		print("Item.gd -> set_amount(value):")
 		print("Amount to add: ", value)
 	var old_amount = item_amount
+	var space_available = get_space_available()
 	
 	# There is space to store the items
-	if(item_capacity >= item_amount + value):
+	if(space_available >= value):
 		item_amount = value
+		if(self.debug):
+			print("Adding everything: ", item_amount)
 	else: # There is not enough space
-		var space_available = get_space_available()
-		
 		# We know because of the first check that value is bigger than
 		# the space available
 		var remaining_items = value - space_available
 		
-		# NOTE: This would be recursive
-		#self.item_amount = item_capacity
 		# Fill it up
 		item_amount = item_capacity
 		
 		# Set the overflow to the remaining items, but we don't know for sure
 		# if item_overflow is empty, so we add items to it
-		overflow += remaining_items
+		self.overflow += remaining_items
+		if(self.debug):
+			print("There is not enough space to store the items")
+			print(self.item_name, " slot: ", self.item_slot)
+			print("Capacity: ", self.item_capacity,
+					", Amount: ", self.item_amount,
+					", Overflow: ", self.overflow)
 	
 	emit_signal("amount_changed", old_amount, item_amount)
 func get_amount():

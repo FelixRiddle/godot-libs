@@ -67,11 +67,29 @@ func try_place(item, prev_item):
 		return false
 
 
+# Insert an item to the items dictionary(the actual inventory)
+# item: An Item class instance
+func insert_item(item):
+	if(debug):
+		print("Inventory.gd -> _insert_item(item):")
+	
+	# The argument here is to make a "deep" copy of the dictionary
+	var old_inventory = items.duplicate(true)
+	
+	# Insert the item in the items dictionary
+	self.items[item["uuid"]] = item
+	
+	emit_signal("item_added", item)
+	emit_signal("inventory_changed", old_inventory, self.items)
+	emit_signal("slots_changed", old_inventory, items)
+	return item
+
+
 # Search for available space and add items
 # If there isn't enough space, it will return the amount remaining
 # items_arr: An array of the item in inventory
 # amount: Amount of items to add 
-func _search_and_add(items_arr, amount):
+func search_and_add(items_arr:Array, amount:int) -> int:
 	if(debug):
 		print("Inventory.gd -> _search_and_add(items_arr, amount):")
 	
@@ -96,6 +114,37 @@ func _search_and_add(items_arr, amount):
 	return amount
 
 
+func _validate_data(item_data) -> bool:
+	if(item_data.has("_") && item_data.has("default_dictionary") &&
+			item_data["default_dictionary"]):
+		# Get outta here
+		return false
+	elif(item_data.has("info")):
+		var required_data:Dictionary = {
+			"item_id": 1,
+			"item_amount": 1,
+		}
+		var info = item_data["info"]
+		
+		var validated = DictionaryUtils.validate_options(
+			{ "info": info },
+			required_data)
+		
+		if(!validated):
+			if(self.debug):
+				print("Inventory(Script) -> add_item_by_id():")
+				print("At least id and amount are required.")
+				print("Data given: ", item_data)
+			
+			# Get outta here
+			return false
+	else:
+		# Get outta here
+		return false
+	
+	return true
+
+
 # Add item by its id
 # Returns a dict with with a state string
 # WRONG_DATA: Wrong data given
@@ -111,77 +160,85 @@ func add_item_by_dictionary(item_data:Dictionary={
 	if(debug):
 		print("Inventory.gd -> add_item_by_dictionary(data:Dictionary):")
 	
-	var amount
-	var id
-	var info
+	var data_validated = _validate_data(item_data)
+	if(!data_validated):
+		if(self.debug):
+			print("Wrong data given")
+		return { "state": "WRONG_DATA" }
 	
-	if(item_data.has("_") && item_data.has("default_dictionary") &&
-			item_data["default_dictionary"]):
-		# Get outta here
-		return { "state": "WRONG_DATA" }
-	elif(item_data.has("info")):
-		var required_data:Dictionary = {
-			"item_id": 1,
-			"item_amount": 1,
-		}
-		info = item_data["info"]
-		
-		var validated = DictionaryUtils.validate_options(
-			{ "info": info },
-			required_data)
-		
-		if(validated):
-			id = info["item_id"]
-			amount = info["item_amount"]
-		else:
-			if(self.debug):
-				print("Inventory(Script) -> add_item_by_id():")
-				print("At least id and amount are required.")
-				print("Data given: ", item_data)
-			
-			# Get outta here
-			return { "state": "WRONG_DATA" }
-	else:
-		# Get outta here
-		return { "state": "WRONG_DATA" }
+	var info = item_data["info"]
+	var id = info["item_id"]
 	
 	# Check if the item already exists and if it has space available
 	var items_found = get_items_by_id(id)
-	if(self.debug):
-		print("Items in inventory with the same id: ", items_found)
-	
-	# If the item already exists
-	if items_found:
-		var remaining = _search_and_add(items_found, amount)
+	if(items_found):
+		if(self.debug):
+			print("Items in inventory with the same id: ", items_found)
+			print("Starting quantity: ", info["item_amount"])
 		
-		if(remaining >= 1):
-			info["item_amount"] = remaining
+		info["item_amount"] = search_and_add(items_found, info["item_amount"])
+		
+		if(self.debug):
+			print("End quantity: ", info["item_amount"])
+		
+		if(info["item_amount"] == 0):
 			if(self.debug):
-				print("Remaining: ", remaining)
-				print("Not enough space to add items, " + \
-						"trying to create a new slot")
-		else:
+				print("Items added onto existing slots")
+			
+			# Items added onto existing slots
+			return { "state": "ITEM_ADDED", "data": info }
+	
+	# Insert new items
+	var cap = info["item_capacity"]
+	for i in range(size):
+		# Check if the inventory is full
+		if(is_full()):
 			if(self.debug):
-				print("Added items")
-			return { "state": "ITEM_ADDED" }
+				print("The inventory script is full, cannot add more items.")
+			
+			return { "state": "INVENTORY_FULL", "data": info }
+		
+		# There are no more items to add
+		if(info["item_amount"] <= 0):
+			return  { "state": "ITEM_INSERTED", "data": info }
+		
+		# Create item
+		var new_item = Item.new()
+		
+		# Necessary sets before using set_info
+		new_item["debug"] = self.debug
+		
+		# We need to set this first, so that when we set the
+		# amount for the first
+		# time it won't break
+		new_item["item_capacity"] = info["item_capacity"] \
+				if(info.has("item_capacity")) \
+				else new_item["item_capacity"]
+		
+		# Info dictionary doesn't has the new slot
+		var empty_slot = get_first_empty_slot()
+		info["item_slot"] = empty_slot
+#		new_item["item_slot"] = empty_slot
+		
+		# Set every information in info to the new item
+		ObjectUtils.set_info_unsafe(new_item, info)
+		
+		# Overrides
+		# We won't make use of overflow here, so reset it to 0
+		new_item["overflow"] = 0
+#		new_item["item_amount"] = insert_quantity
+		
+		# Insert item
+		insert_item(new_item)
+		
+		# Update item_amount
+		var insert_quantity = cap
+		info["item_amount"] -= cap
+		if(self.debug):
+			print("Item amount(", info["item_amount"],
+					") - capacity(", cap, "): ", insert_quantity)
 	
-	# Check if the inventory is full
-	if is_full():
-		return { "state": "INVENTORY_FULL", "data": info }
-	
-	# Create item
-	var new_item = Item.new()
-	
-	# We need to set this first, so that when we set the amount for the first
-	# time it won't break
-	new_item["item_capacity"] = info["item_capacity"] \
-			if(info.has("item_capacity")) \
-			else new_item["item_capacity"]
-	ObjectUtils.set_info_unsafe(new_item, info)
-	new_item.set_slot(get_first_empty_slot())
-	
-	_insert_item(new_item)
-	return { "state": "ITEM_INSERTED" }
+	return  { "state": "UNKNOWN_STATE", "data": info }
 # Aliases
 func add_item_by_dict(dict):
 	return add_item_by_dictionary(dict)
@@ -348,11 +405,11 @@ func get_used_slots_array():
 
 # Check if the inventory is full
 func is_full():
-	var items_amount = self.items.keys().size()
+	var slots_used = self.items.keys().size()
 	if(debug):
 		print("Inventory.gd -> is_full():")
 	
-	if(items_amount >= self.size):
+	if(slots_used >= self.size):
 		return true
 	
 	return false
@@ -438,24 +495,6 @@ func remove_item_by_slot(value):
 			return remove_item_by_uuid(i)
 
 
-# Insert an item to the items dictionary(the actual inventory)
-# item: An Item class instance
-func _insert_item(item):
-	if(debug):
-		print("Inventory.gd -> _insert_item(item):")
-	
-	# The argument here is to make a "deep" copy of the dictionary
-	var old_inventory = items.duplicate(true)
-	
-	# Insert the item in the items dictionary
-	self.items[item["uuid"]] = item
-	
-	emit_signal("item_added", item)
-	emit_signal("inventory_changed", old_inventory, self.items)
-	emit_signal("slots_changed", old_inventory, items)
-	return item
-
-
 ### Size
 func set_size(value:int) -> void:
 	size = value
@@ -463,40 +502,3 @@ func get_size() -> int:
 	return size
 func set_length(value) -> void:
 	set_size(value)
-
-
-### Signals ###
-# item: Instance of Item class
-func on_Inventory_item_added(item):
-	if(debug):
-		print("Inventory.gd -> on_Inventory_item_added:")
-		print("Received item in signal: ", item)
-	
-	# Check if the item exists and if it has the methods needed
-	if(item && item.has_overflow()):
-		if(self.debug):
-			print("Adding overflow")
-		
-		# Overflow management
-		# First try to add in the inventory
-		var item_dict = {}
-		
-		# First we drop the overflow and then we get the item dictionary, or
-		# else, we would create a new item with overflow, and this would loop
-		# forever
-		var item_overflow = item.drop_overflow()
-		# We also need to duplicate the item image, in case it changes
-		var item_image = item["item_image"].duplicate()
-		item_dict = item.get_as_dict()
-		
-		# Set the new item amount to the overflow of the previous item
-		item_dict["item_amount"] = item_overflow
-		item_dict["item_image"] = item_image
-		if(self.debug):
-			print("Item dict: ", item_dict)
-			print("Item overflow: ", item_dict["item_amount"])
-		
-		# Add item checks for the amount and id keys in the dictionary
-		var state = add_item_by_dict({ "info": item_dict })
-		if(self.debug):
-			print("State of add overflow operation: ", state["state"])

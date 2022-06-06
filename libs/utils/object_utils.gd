@@ -3,13 +3,10 @@ class_name ObjectUtils
 # set info
 static func set_info_unsafe(object, data:Dictionary):
 	for prop in data.keys():
-		var evaluation = object.get(prop) != null
-#		print(prop, " != null: ", evaluation)
-		# Check if the key exists
-		if(evaluation):
-#			print(prop, " has been set to: ", data[prop])
-#			print("Object[", prop, "]: ", object[prop])
-			object[prop] = data[prop]
+#		var evaluation = object.get(prop) != null
+#		# Check if the key exists
+#		if(evaluation):
+		object[prop] = data[prop]
 	
 	return object
 
