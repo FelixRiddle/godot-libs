@@ -97,7 +97,7 @@ func _search_and_add(items_arr, amount):
 
 
 # Add item by its id
-# Returns state in a string
+# Returns a dict with with a state string
 # WRONG_DATA: Wrong data given
 # ITEM_ADDED: The item was added onto a slot that wasn't full
 # INVENTORY_FULL: The inventory is full
@@ -107,9 +107,9 @@ func add_item_by_dictionary(item_data:Dictionary={
 					"default_dictionary": true,
 				},
 			"info": { }
-			}) -> String:
+			}) -> Dictionary:
 	if(debug):
-		print("Inventory.gd -> add_item_by_id(id, amount):")
+		print("Inventory.gd -> add_item_by_dictionary(data:Dictionary):")
 	
 	var amount
 	var id
@@ -118,7 +118,7 @@ func add_item_by_dictionary(item_data:Dictionary={
 	if(item_data.has("_") && item_data.has("default_dictionary") &&
 			item_data["default_dictionary"]):
 		# Get outta here
-		return "WRONG_DATA"
+		return { "state": "WRONG_DATA" }
 	elif(item_data.has("info")):
 		var required_data:Dictionary = {
 			"item_id": 1,
@@ -140,10 +140,10 @@ func add_item_by_dictionary(item_data:Dictionary={
 				print("Data given: ", item_data)
 			
 			# Get outta here
-			return "WRONG_DATA"
+			return { "state": "WRONG_DATA" }
 	else:
 		# Get outta here
-		return "WRONG_DATA"
+		return { "state": "WRONG_DATA" }
 	
 	# Check if the item already exists and if it has space available
 	var items_found = get_items_by_id(id)
@@ -157,18 +157,17 @@ func add_item_by_dictionary(item_data:Dictionary={
 		if(remaining >= 1):
 			info["item_amount"] = remaining
 			if(self.debug):
+				print("Remaining: ", remaining)
 				print("Not enough space to add items, " + \
 						"trying to create a new slot")
 		else:
 			if(self.debug):
 				print("Added items")
-			return "ITEM_ADDED"
+			return { "state": "ITEM_ADDED" }
 	
 	# Check if the inventory is full
 	if is_full():
-		if(self.debug):
-			print("Inventory full")
-		return "INVENTORY_FULL"
+		return { "state": "INVENTORY_FULL", "data": info }
 	
 	# Create item
 	var new_item = Item.new()
@@ -182,7 +181,7 @@ func add_item_by_dictionary(item_data:Dictionary={
 	new_item.set_slot(get_first_empty_slot())
 	
 	_insert_item(new_item)
-	return "ITEM_INSERTED"
+	return { "state": "ITEM_INSERTED" }
 # Aliases
 func add_item_by_dict(dict):
 	return add_item_by_dictionary(dict)
@@ -196,13 +195,6 @@ static func create_zero_array(length):
 	return temp
 
 
-# Defaults to get_empty_slots_array(), DON'T CHANGE
-func get_slots_available():
-	return get_empty_slots_array()
-func get_empty_slots():
-	return get_empty_slots_array()
-
-
 # Get an array of the empty slots indexes
 func get_empty_slots_array():
 	if(debug):
@@ -210,14 +202,12 @@ func get_empty_slots_array():
 	
 	var result_array = []
 	if(!self.items):
-#		for i in range(1, self.size + 1):
 		for i in range(0, self.size):
 			result_array.push_back(i)
 		return result_array
 	else:
 		var occupied_slots = get_used_slots_array()
 		
-#		for i in range(1, self.size + 1):
 		for i in range(0, self.size):
 			var isnt_occupied = true
 			
@@ -230,6 +220,11 @@ func get_empty_slots_array():
 			if(isnt_occupied):
 				result_array.push_back(i)
 		return result_array
+# Aliases
+func get_slots_available():
+	return get_empty_slots_array()
+func get_empty_slots():
+	return get_empty_slots_array()
 
 
 # Get the first available slot, returns null if there are no slots available
@@ -264,14 +259,12 @@ func get_items_by_id(value):
 				curr_item.get_id() == value):
 			# Push item at the end of the array
 			temp_arr.push_back(curr_item)
-			# Push item at the start
-			#temp_arr.push_front(curr_item)
-	if(debug && temp_arr): print("Temp arr: ", temp_arr)
 	
 	# Check if the array is empty
 	if temp_arr.empty():
 		return null
-	else: return temp_arr
+	else:
+		return temp_arr
 
 
 # Get item by name
@@ -291,13 +284,7 @@ func get_item_by_name(value):
 
 
 # Get items by name
-func get_items_by_name(value):
-	# Check if its the correct type
-	if typeof(value) != TYPE_STRING:
-		print("Inventory.gd -> get_items_by_name(value): Value is not " +
-			"a string, value: %s" % value)
-		return
-	
+func get_items_by_name(value:String):
 	var temp_arr = []
 	for i in items.keys():
 		#print("Current item: %s" % i)
@@ -307,7 +294,8 @@ func get_items_by_name(value):
 	# Check if the array is empty
 	if temp_arr.empty():
 		return null
-	else: return temp_arr
+	else:
+		return temp_arr
 
 
 # Get item by uuid, pretty useless, but just in case
@@ -360,16 +348,14 @@ func get_used_slots_array():
 
 # Check if the inventory is full
 func is_full():
-	if(self.debug):
+	var items_amount = self.items.keys().size()
+	if(debug):
 		print("Inventory.gd -> is_full():")
 	
-	# Get available slots
-	var slots_available = get_slots_available()
-	# If the slots_available array is empty, it's the same as null
-	if(slots_available):
-		return false
-	else:
+	if(items_amount >= self.size):
 		return true
+	
+	return false
 
 
 # Print items on the console
@@ -472,16 +458,15 @@ func _insert_item(item):
 
 ### Size
 func set_size(value:int) -> void:
-#	if(self.debug):
-#		print("Inventory(script) -> set_size() || set_length(): ")
 	size = value
 func get_size() -> int:
 	return size
 func set_length(value) -> void:
 	set_size(value)
 
+
 ### Signals ###
-# new_item: Instance of Item class
+# item: Instance of Item class
 func on_Inventory_item_added(item):
 	if(debug):
 		print("Inventory.gd -> on_Inventory_item_added:")
@@ -489,6 +474,9 @@ func on_Inventory_item_added(item):
 	
 	# Check if the item exists and if it has the methods needed
 	if(item && item.has_overflow()):
+		if(self.debug):
+			print("Adding overflow")
+		
 		# Overflow management
 		# First try to add in the inventory
 		var item_dict = {}
@@ -511,4 +499,4 @@ func on_Inventory_item_added(item):
 		# Add item checks for the amount and id keys in the dictionary
 		var state = add_item_by_dict({ "info": item_dict })
 		if(self.debug):
-			print("State of add overflow operation: ", state)
+			print("State of add overflow operation: ", state["state"])
