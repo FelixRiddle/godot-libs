@@ -218,7 +218,6 @@ func add_item_by_dictionary(item_data:Dictionary={
 		# Info dictionary doesn't has the new slot
 		var empty_slot = get_first_empty_slot()
 		info["item_slot"] = empty_slot
-#		new_item["item_slot"] = empty_slot
 		
 		# Set every information in info to the new item
 		ObjectUtils.set_info_unsafe(new_item, info)
@@ -226,7 +225,6 @@ func add_item_by_dictionary(item_data:Dictionary={
 		# Overrides
 		# We won't make use of overflow here, so reset it to 0
 		new_item["overflow"] = 0
-#		new_item["item_amount"] = insert_quantity
 		
 		# Insert item
 		insert_item(new_item)
