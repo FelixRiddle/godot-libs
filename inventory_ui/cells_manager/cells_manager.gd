@@ -2,7 +2,7 @@ extends Control
 class_name CellsManager
 
 var Cell:PackedScene = preload("res://godot-libs/inventory_ui/" + \
-		"cells_manager/cell/cell.tscn")
+		"cells_manager/cell_v2/cell_v2.tscn")
 var InventoryScript = preload("res://godot-libs/inventory/inventory.gd")
 var ObjectUtils = preload("res://godot-libs/libs/utils/object_utils.gd")
 
@@ -16,7 +16,6 @@ export(bool) var debug:bool = false setget set_debug, get_debug
 export(int) var length:int = 0 setget set_length, get_length
 
 var can_grab_focus = false setget set_can_grab_focus, get_can_grab_focus
-var cell_type = 1 setget set_cell_type, get_cell_type
 var cells:Array = [] setget set_cells, get_cells
 var cells_container = Node.new() setget set_cells_container, \
 		get_cells_container
@@ -204,13 +203,7 @@ func remove_overflow() -> void:
 # Grab focus of the given cell
 func select_cell(selected_cell) -> void:
 	if(selected_cell):
-		if(self.cell_type == 1):
-			var texture_btn = selected_cell.get_node("TextureButton")
-			
-			if(texture_btn is TextureButton):
-				texture_btn.grab_focus()
-		elif(self.cell_type == 2):
-			selected_cell.grab_focus()
+		selected_cell.grab_focus()
 
 
 func restore_focus() -> void:
@@ -304,38 +297,6 @@ func change_cells_textures(textures:Dictionary) -> bool:
 	return set_cells_textures(textures)
 func change_cells_sprites(textures:Dictionary) -> bool:
 	return set_cells_textures(textures)
-
-
-func set_cell_type(value:int) -> void:
-	cell_type = value
-	update_cell_type()
-func get_cell_type() -> int:
-	return cell_type
-
-
-func update_cell_type():
-	if(debug):
-		print("CellsManager -> update_cell_type():")
-	
-	# Set cell type
-	if(self.cell_type == 1):
-		Cell = load("res://godot-libs/inventory_ui/" + \
-				"cells_manager/cell/cell.tscn")
-	elif(self.cell_type == 2):
-		Cell = load("res://godot-libs/inventory_ui/" + \
-				"cells_manager/cell_v2/cell_v2.tscn")
-	
-	# Update the cells
-	var result:Dictionary = ArrayUtils.smart_change_length(
-			self.cells,
-			self.length,
-			Cell,
-			{
-				"debug": self.debug,
-			})
-	
-	if("new_array" in result):
-		_update_cells(result["new_array"])
 
 
 # Get the default rect size, which will be a 5% of the window width

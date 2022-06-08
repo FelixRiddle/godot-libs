@@ -19,7 +19,6 @@ func _ready():
 	if(debug):
 		print("HotbarV2 -> _ready():")
 	cm.can_grab_focus = false
-	cm.set_cell_type(2)
 	
 	if(debug):
 		print("Length: ", length)

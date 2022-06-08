@@ -24,7 +24,6 @@ func _ready():
 		{
 			"debug": debug,
 			"can_grab_focus": true,
-			"cell_type": 2,
 			"length": length,
 		})
 	if(debug):

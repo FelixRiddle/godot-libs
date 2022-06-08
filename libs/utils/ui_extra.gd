@@ -240,7 +240,7 @@ static func set_hotbar_panel_anchors(options:Dictionary):
 static func center_inventory_anchors(options:Dictionary):
 	# Data required for this function to work properly
 	var required_data = {
-			"cells_manager": CellsManager.new(),
+			"cells_manager": Node.new(),
 			"inventory": Control.new(),
 			"rows": 1,
 		}
