@@ -6,3 +6,56 @@
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="GraphicSettings" type="VBoxContainer" parent="Panel/AspectRatioContainer"]
+margin_left = 212.0
+margin_right = 812.0
+margin_bottom = 600.0
+
+[node name="Resolution" type="HBoxContainer" parent="Panel/AspectRatioContainer/GraphicSettings"]
+margin_right = 600.0
+margin_bottom = 20.0
+
+[node name="Label" type="Label" parent="Panel/AspectRatioContainer/GraphicSettings/Resolution"]
+margin_top = 3.0
+margin_right = 68.0
+margin_bottom = 17.0
+text = "Resolution"
+
+[node name="OptionButton" type="OptionButton" parent="Panel/AspectRatioContainer/GraphicSettings/Resolution"]
+margin_left = 72.0
+margin_right = 101.0
+margin_bottom = 20.0
+
+[node name="GUIAspectRatio" type="HBoxContainer" parent="Panel/AspectRatioContainer/GraphicSettings"]
+margin_top = 24.0
+margin_right = 600.0
+margin_bottom = 44.0
+
+[node name="Label" type="Label" parent="Panel/AspectRatioContainer/GraphicSettings/GUIAspectRatio"]
+margin_top = 3.0
+margin_right = 104.0
+margin_bottom = 17.0
+text = "GUI aspect ratio"
+
+[node name="OptionButton" type="OptionButton" parent="Panel/AspectRatioContainer/GraphicSettings/GUIAspectRatio"]
+margin_left = 108.0
+margin_right = 137.0
+margin_bottom = 20.0
+
+[node name="VSync" type="CheckBox" parent="Panel/AspectRatioContainer/GraphicSettings"]
+margin_top = 48.0
+margin_right = 600.0
+margin_bottom = 72.0
+text = "Use VSync"
+
+[connection signal="item_selected" from="Panel/AspectRatioContainer/GraphicSettings/Resolution/OptionButton" to="." method="_on_OptionButton_item_selected"]
+[connection signal="item_selected" from="Panel/AspectRatioContainer/GraphicSettings/GUIAspectRatio/OptionButton" to="." method="_on_GUIAspectRatio_item_selected"]
