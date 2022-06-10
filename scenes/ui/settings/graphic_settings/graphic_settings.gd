@@ -111,3 +111,7 @@ func _on_OptionButton_item_selected(index):
 
 func _on_resized():
 	update_container()
+
+
+func _on_VSync_toggled(button_pressed):
+	OS.vsync_enabled = !OS.vsync_enabled
